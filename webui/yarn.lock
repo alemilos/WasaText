@@ -1122,6 +1122,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"oh-vue-icons@npm:^1.0.0-rc3":
+  version: 1.0.0-rc3
+  resolution: "oh-vue-icons@npm:1.0.0-rc3"
+  dependencies:
+    vue-demi: "npm:^0.12.5"
+  peerDependencies:
+    "@vue/composition-api": ^1.0.0-rc.1
+    vue: ^2.0.0 || >=3.0.0
+  peerDependenciesMeta:
+    "@vue/composition-api":
+      optional: true
+  checksum: 10/2d6116432ccc8f343d18ff338f246beb24797d7c4b3b3948666cb6e73dc1397e1576de471f6395700f6e1312e253200eda18b060492f9b69880a327b10f1137a
+  languageName: node
+  linkType: hard
+
 "p-map@npm:^4.0.0":
   version: 4.0.0
   resolution: "p-map@npm:4.0.0"
@@ -1408,6 +1423,7 @@ __metadata:
   dependencies:
     "@vitejs/plugin-vue": "npm:^3.0.1"
     axios: "npm:0.28.0"
+    oh-vue-icons: "npm:^1.0.0-rc3"
     vite: "npm:^3.0.4"
     vue: "npm:^3.2.37"
     vue-router: "npm:^4.1.3"
@@ -1474,6 +1490,22 @@ __metadata:
   bin:
     vite: bin/vite.js
   checksum: 10/3933d93165235001e79c99b69434a91a85404572d698c5160e910237d9ae3833ecea0dcfe1ca2967543e6bf28b419f90c3cb4899782ec9d43bf17ca2accaf361
+  languageName: node
+  linkType: hard
+
+"vue-demi@npm:^0.12.5":
+  version: 0.12.5
+  resolution: "vue-demi@npm:0.12.5"
+  peerDependencies:
+    "@vue/composition-api": ^1.0.0-rc.1
+    vue: ^3.0.0-0 || ^2.6.0
+  peerDependenciesMeta:
+    "@vue/composition-api":
+      optional: true
+  bin:
+    vue-demi-fix: bin/vue-demi-fix.js
+    vue-demi-switch: bin/vue-demi-switch.js
+  checksum: 10/2e88fb2305ae0211cf0ea32cc6e62bbb687c4447053bae6be82dc4fffa6e05cdfe11ef5b6799397b2f45841fe8d5c8b4dd9902b7738d651dc5b7103d489918af
   languageName: node
   linkType: hard
 

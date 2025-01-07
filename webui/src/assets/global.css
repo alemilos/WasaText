@@ -1,0 +1,21 @@
+:root {
+	/* Colors  */
+	--color-primary: #141414;
+
+	--color-black: #0b0c0e;
+	--color-white: #fff;
+	--color-white-20: rgba(255, 255, 255, 0.2);
+	--color-white-70: rgba(255, 255, 255, 0.7);
+	--color-green-primary: #4ef17a;
+	--color-green-dark: #07581c;
+}
+
+@font-face {
+	font-family: "Jersey 15";
+	src: url("./fonts/Jersey_15/Jersey15-Regular.ttf");
+}
+
+* {
+	margin: 0;
+	font-family: "Jersey 15";
+}
