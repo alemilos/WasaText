@@ -2,6 +2,7 @@
 import "./style/LoginView.css";
 import Logo from "../assets/images/logo.png";
 import { hackerText } from "../utils/text";
+import axios from "../services/axios";
 </script>
 
 <script>
@@ -20,7 +21,7 @@ export default {
 				throw new Error("Invalid Username");
 			}
 
-			console.log("make post request to login: ", username.trim());
+			axios.post("/login", {});
 		},
 	},
 
