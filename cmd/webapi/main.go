@@ -118,6 +118,7 @@ func run() error {
 		logger.WithError(err).Error("error creating the API server instance")
 		return fmt.Errorf("creating the API server instance: %w", err)
 	}
+
 	router := apirouter.Handler()
 
 	router, err = registerWebUI(router)
@@ -125,6 +126,9 @@ func run() error {
 		logger.WithError(err).Error("error registering web UI handler")
 		return fmt.Errorf("registering web UI handler: %w", err)
 	}
+
+	/////////////////
+	// Middlewares...
 
 	// Apply CORS policy
 	router = applyCORSHandler(router)
