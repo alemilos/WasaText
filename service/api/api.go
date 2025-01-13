@@ -78,6 +78,7 @@ func New(cfg Config) (Router, error) {
 	router.RedirectTrailingSlash = false
 	router.RedirectFixedPath = false
 
+
 	return &_router{
 		router:     router,
 		baseLogger: cfg.Logger,
