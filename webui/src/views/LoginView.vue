@@ -1,41 +1,39 @@
 <script setup>
-import "./style/LoginView.css";
-import Logo from "../assets/images/logo.png";
-import { hackerText } from "../utils/text";
-import axios from "../services/axios";
-</script>
+	import "./style/LoginView.css";
+	import Logo from "../assets/images/logo.png";
+	import { hackerText } from "../utils/text";
+	import {useTemplateRef, onMounted} from 'vue'
+	import {useRouter} from 'vue-router'
+	import axios from '../services/axios'
 
-<script>
-export default {
-	data() {
-		return {
-			logo: Logo,
-		};
-	},
+	const title = useTemplateRef('title')
+	const username = useTemplateRef('username')
+	const router = useRouter()
 
-	methods: {
-		submit(e) {
+	async function submit(e) {
 			e.preventDefault();
-			const username = this.$refs.username.value;
-			if (!username || username === "") {
+			if (!username.value || username.value === "") {
 				throw new Error("Invalid Username");
 			}
+			const res = await axios.post("/login", {username});
+		
+			if (res.status === 200){
+				router.push("/")
+			}
+		}
 
-			axios.post("/login", {});
-		},
-	},
+	onMounted(() =>  {
+		hackerText(title.value); // apply hacker animation
+	})
 
-	mounted() {
-		hackerText(this.$refs.title); // apply hacker animation
-	},
-};
+
 </script>
 
 <template>
 	<div class="login-container">
 		<div class="form-container">
 			<div class="form-heading">
-				<img :src="logo" alt="logo" />
+				<img :src="Logo" alt="logo" />
 				<h1 ref="title">Accedi a WasaText</h1>
 				<p>
 					Chatta in modo <span>sicuro</span> e <span>veloce</span>,
