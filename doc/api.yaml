@@ -5,19 +5,55 @@ info:
     This API allows users to interact with each other 
     on the WasaText app.
     Users can create groups, private chats, send text or image messages, 
-    reply, forward, react or comment them.
-  version: 0.0.1
+    reply, forward or react them.
+  version: 1.0.0
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: UUID
+      description: |
+        Use the user identifier returned by `/login` in the Authorization header.
+        Example: `Authorization: Bearer abcdef012345`
+  responses:
+    UnauthorizedError:
+      description: Missing or invalid Authorization header
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Unauthorized: missing or invalid user ID"
+  schemas:
+    ImageUpload:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+          description: >
+            Image file to upload. Allowed types: jpeg, png, webp.
+            Max size: 2MB.
+      required:
+        - file
+
+security:
+  - BearerAuth: []
 
 paths:
-  /session:
+  /login:
     post:
-      tags: ["login"]
-      summary: Logs in the user
+      summary: Log in the user
       description: |-
         If the user does not exist, it will be created,
         and an identifier is returned.
         If the user exists, the user identifier is returned.
       operationId: doLogin
+      security: [] # Override the security header
       requestBody:
         description: User details
         content:
@@ -27,7 +63,7 @@ paths:
               properties:
                 username:
                   type: string
-                  example: Maria
+                  example: AleMilos
                   pattern: "^[a-zA-Z0-9_]{3,16}$"
                   minLength: 3
                   maxLength: 16
@@ -44,9 +80,12 @@ paths:
                     type: string
                     example: "abcdef012345"
 
-  /users/me/username:
+  /me/username:
     put:
-      summary: set username for user
+      summary: Set username for a user
+      description:
+        Change the username for a user. The username must be a string of minum
+        length 3 and maximum length 16 and contain only alphabet characters, numbers and underscores.
       operationId: setMyUsername
       requestBody:
         description: Update username if it doesn't already exist
@@ -57,7 +96,7 @@ paths:
               properties:
                 username:
                   type: string
-                  example: Maria2
+                  example: alemilos
                   pattern: "^[a-zA-Z0-9_]{3,16}$"
                   minLength: 3
                   maxLength: 16
@@ -83,9 +122,25 @@ paths:
                   message:
                     type: string
                     example: "The username must be between 3 and 16 characters and contain only alphanumeric characters or underscores"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
-        "403":
-          description: Username already exists
+  /me/photo:
+    post:
+      summary: Upload a profile image
+      description:
+        Upload a user's profile image. The image must be of jpeg, png or webp format and its size
+        must be at most 2Mb.
+      operationId: setMyPhoto
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ImageUpload"
+      responses:
+        "200":
+          description: Profile photo uploaded successfully
           content:
             application/json:
               schema:
@@ -93,125 +148,418 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "The username couldn't be updated because it already exists"
-
-  /games:
-    post:
-      summary: start a new game
-      description: |
-        Start a new game generating the secret number 
-        and return the created game id
-      responses:
-        "200":
-          description: new game created
+                    example: "Profile photo updated"
+                  photoPath:
+                    type: string
+                    example: /uploads/profiles/1.png
+        "400":
+          description: Invalid input image
           content:
             application/json:
               schema:
-                type: integer
+                type: "object"
+                properties:
+                  error:
+                    type: "string"
+                    description: >
+                      error:
+                      * `First Error`  - No file uploaded.
+                      * `Second Error` - Wrong file format. Only jpeg, png and webp are allowed.
+                      * `Third Error`  - File too big. The image can't be bigger than 2Mb.
+                    enum:
+                      - "No file uploaded!"
+                      - "Wrong file format. Only jpeg, png and webp are allowed."
+                      - "File too big. The image can't be bigger than 2Mb."
+                    default: "Wrong file format. Only jpeg, png and webp are allowed."
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /conversations:
     get:
-      summary: list all games
-      description: |
-        Obtain the list of all games, with the final result (win/lose) 
-        and the number of guesses
+      summary: Get a user's conversations
+      description:
+        Get all user's conversations. Each conversation entry will contain the conversation fields and
+        if present, a lastMessage entry acting as a preview for the conversation.
+      operationId: getMyConversations
       responses:
         "200":
-          description: |
-            An array of objects, each one containing the game id, 
-            the final outcome, and the number of guesses
+          description: Success
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/final-result"
-  /games/{id}:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        description: this is the game id
-        schema:
-          type: integer
-          description: e.g., /games/1234
-    put:
-      summary: start or reset a game
-      description: |
-        Start a game with given id, generating the secret number; 
-        or reset an existing game, re-generating the secret number 
-        and zeroing the guesses counter
-      responses:
-        "200":
-          description: An existing game is reset
-        "201":
-          description: A new game is created
-    post:
-      summary: make a guess
-      description: |
-        Try to guess the secret number; return hi, lo, or correct, 
-        plus the guess count.
+                  type: object
+                  properties:
+                    conversationId:
+                      type: integer
+                    type:
+                      type: string
+                      enum: [private, group]
+                    name:
+                      type: string
+                    photo_path:
+                      type: string
+                      nullable: true
+                    created_by:
+                      type: integer
+                    created_at:
+                      type: string
+                      format: date-time
+                    lastMessage:
+                      type: object
+                      nullable: true
+                      properties:
+                        id:
+                          type: integer
+                        type:
+                          type: string
+                          enum: [text, image]
+                        is_forwarded:
+                          type: boolean
+                        author_id:
+                          type: integer
+                        content:
+                          type: string
+                        created_at:
+                          type: string
+                          format: date-time
+              example:
+                - conversationId: 7
+                  type: group
+                  name: Partite Calcio
+                  photo_path: "/uploads/groups/7/photo.png"
+                  created_by: 31
+                  created_at: "2025-09-29T14:48:00Z"
+                  lastMessage:
+                    id: 239
+                    type: text
+                    is_forwarded: false
+                    author_id: 20
+                    content: "Va bene ci sono per stasera, ci vediamo!"
+                    created_at: "2025-09-28T16:30:00Z"
+                - conversationId: 12
+                  type: private
+                  name: "Edoardo"
+                  photo_path: null
+                  created_by: 31
+                  created_at: "2025-09-25T09:20:00Z"
+                  lastMessage:
+                    id: 312
+                    type: text
+                    is_forwarded: false
+                    author_id: 45
+                    content: "Ci sentiamo più tardi!"
+                    created_at: "2025-09-28T18:10:00Z"
+
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /conversations/{id}:
+    get:
+      summary: Get a conversation by id
+      description:
+        Get a conversation with all the messages belonging to it. The converation can either be a
+        private chat or a group chat. Each message entry will contain the message fields and
+        the message status fields.
+      operationId: getConversation
       parameters:
-        - name: guess
-          in: query
+        - name: id
+          in: path
           required: true
-          description: the guess
           schema:
             type: integer
-            minimum: 1
-            maximum: 100
       responses:
         "200":
-          description: Guess accepted, the result is in the the content
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/guess-result"
-        "403":
-          description: game over
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/final-result"
-        "404":
-          description: game not found
-    get:
-      summary: list guesses
-      description: |
-        Return a list of all guesses in reverse chronological order, 
-        including the responses received (hi/lo/correct)
-      responses:
-        "200":
-          description: Request accepted, all guesses listed in content
+          description: Success
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/guess-result"
+                  type: object
+                  properties:
+                    messageId:
+                      type: integer
+                    type:
+                      type: string
+                      enum: [text, image]
+                    is_forwarded:
+                      type: boolean
+                    content:
+                      type: string
+                    author_id:
+                      type: integer
+                    created_at:
+                      type: string
+                      format: date-time
+                    messageStatus:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          enum: [received, read]
+                        members:
+                          type: array
+                          items:
+                            type: integer
+              example:
+                - messageId: 65
+                  type: image
+                  is_forwarded: true
+                  content: "/uploads/groups/7/images/photo123.jpeg"
+                  author_id: 3
+                  created_at: "2025-09-29T14:48:00Z"
+                  messageStatus:
+                    status: read
+                    members: [1, 2, 3]
+                - messageId: 66
+                  type: text
+                  is_forwarded: false
+                  content: "AHHAAHH che ridere!"
+                  author_id: 1
+                  created_at: "2025-09-29T15:00:00Z"
+                  messageStatus:
+                    status: received
+                    members: [1, 3]
+                - messageId: 67
+                  type: text
+                  is_forwarded: false
+                  content: "No vabbe troppo divertente"
+                  author_id: 2
+                  created_at: "2025-09-29T15:05:00Z"
+                  messageStatus:
+                    status: received
+                    members: [3]
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
-components:
-  schemas:
-    guess-result:
-      type: object
-      properties:
-        guess-count:
-          type: integer
-          minimum: 1
-          maximum: 10
-        guess-outcome:
-          type: string
-          enum:
-            - hi
-            - lo
-            - correct
-    final-result:
-      type: object
-      properties:
-        id:
-          type: integer
-        outcome:
-          type: string
-          enum:
-            - win
-            - lose
-        guesses:
-          type: integer
+  /conversations/{id}/messages:
+    post:
+      summary: Send a message to a conversation
+      description: Send a new message to the specified conversation.
+      operationId: sendMessage
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - type
+                - content
+              properties:
+                type:
+                  type: string
+                  enum: [text]
+                content:
+                  type: string
+                  description: Text content of the message
+            example:
+              type: text
+              content: "Hello, how are you?"
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - type
+                - file
+              properties:
+                type:
+                  type: string
+                  enum: [image]
+                file:
+                  type: string
+                  format: binary
+                  description: >
+                    Image file to send. Allowed types: jpeg, png, webp.
+                    Max size: 2MB.
+      responses:
+        "200":
+          description: Message sent successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  messageId:
+                    type: integer
+                  type:
+                    type: string
+                    enum: [text, image]
+                  content:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+        "400":
+          description: Invalid input image
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  error:
+                    type: "string"
+                    description: >
+                      error:
+                      * `First Error` - Wrong file format. Only jpeg, png and webp are allowed.
+                      * `Second Error`  - File too big. The image can't be bigger than 2Mb.
+                    enum:
+                      - "Wrong file format. Only jpeg, png and webp are allowed."
+                      - "File too big. The image can't be bigger than 2Mb."
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /messages/{id}/forward:
+    post:
+      summary: ""
+      description: ""
+      operationId: forwardMessage
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /messages/{id}/comment:
+    post:
+      summary: ""
+      description: ""
+      operationId: commentMessage
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /messages/{id}/comment/{commentId}:
+    delete:
+      summary: ""
+      description: ""
+      operationId: uncommentMessage
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /messages/{id}:
+    delete:
+      summary: ""
+      description: ""
+      operationId: deleteMessage
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /groups/{id}/members:
+    post:
+      summary: ""
+      description: ""
+      operationId: addToGroup
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+    delete:
+      summary: ""
+      description: ""
+      operationId: leaveGroup
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /groups/{id}/name:
+    put:
+      summary: ""
+      description: ""
+      operationId: setGroupName
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /groups/{id}/photo:
+    put:
+      summary: ""
+      description: ""
+      operationId: setGroupPhoto
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ImageUpload"
+      responses:
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /users:
+    get:
+      summary: ""
+      description: ""
+      operationId: getUsers
+      responses:
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /groups:
+    post:
+      summary: ""
+      description: ""
+      operationId: createGroup
+      responses:
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
