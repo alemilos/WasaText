@@ -419,8 +419,8 @@ paths:
 
   /messages/{id}/forward:
     post:
-      summary: ""
-      description: ""
+      summary: Forward a message to a user
+      description: Forward a message to another user
       operationId: forwardMessage
       parameters:
         - name: id
@@ -428,7 +428,46 @@ paths:
           required: true
           schema:
             type: string
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - userId
+              properties:
+                userId:
+                  type: integer
+            example:
+              userId: 38
+
       responses:
+        "200":
+          description: Message forwarded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              example:
+                message: Message forwarded successfully
+        "400":
+          description: Invalid user
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  error:
+                    type: "string"
+                    description: User not found.
+              example:
+                message: User not found.
+
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
