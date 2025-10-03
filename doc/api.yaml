@@ -27,7 +27,7 @@ components:
             properties:
               message:
                 type: string
-                example: "Unauthorized: missing or invalid user ID"
+                example: "Unauthorized"
   schemas:
     ImageUpload:
       type: object
@@ -267,6 +267,7 @@ paths:
         - name: id
           in: path
           required: true
+          description: The conversation id
           schema:
             type: integer
       responses:
@@ -343,6 +344,7 @@ paths:
         - name: id
           in: path
           required: true
+          description: The conversation id
           schema:
             type: integer
       requestBody:
@@ -426,6 +428,7 @@ paths:
         - name: id
           in: path
           required: true
+          description: The message id
           schema:
             type: string
 
@@ -473,79 +476,235 @@ paths:
 
   /messages/{id}/comment:
     post:
-      summary: ""
-      description: ""
+      summary: React to a message
+      description: React to a message with an emoji.
       operationId: commentMessage
       parameters:
         - name: id
           in: path
           required: true
+          description: The message id
           schema:
             type: string
+      requestBody:
+        description: React to a message with an emoji unicode
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                emoji:
+                  type: string
+                  example: U+2764
+                  pattern: "(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])"
+        required: true
       responses:
+        "200":
+          description: Reacted to message
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                example:
+                  message: Reacted to message successfully
+        "400":
+          description: Invalid emoji unicode
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  error:
+                    description: >
+                      error:
+                      * `First Error` -Invalid emoji unicode 
+                      * `Second Error`  - You have already reacted to this message
+                    enum:
+                      - "Invalid emoji unicode"
+                      - "You have already reacted to this message"
+                example:
+                  message: Invalid emoji unicode
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
   /messages/{id}/comment/{commentId}:
     delete:
-      summary: ""
-      description: ""
+      summary: Remove message reaction
+      description: Delete the emoji reaction from
       operationId: uncommentMessage
       parameters:
         - name: id
           in: path
           required: true
+          description: The message id
           schema:
             type: string
         - name: commentId
           in: path
           required: true
+          description: The comment id
           schema:
             type: string
       responses:
+        "200":
+          description: Message reaction deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              example:
+                message: Message reaction deleted successfully
+        "400":
+          description: Invalid reaction id
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  error:
+                    type: "string"
+                    description: Reaction not found.
+              example:
+                message: Reaction not found.
+
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
   /messages/{id}:
     delete:
-      summary: ""
-      description: ""
+      summary: Delete a message
+      description: Delete a message if it wasn't created more than 30 minutes ago.
       operationId: deleteMessage
       parameters:
         - name: id
           in: path
           required: true
+          description: The message id
           schema:
             type: string
       responses:
+        "200":
+          description: Message deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                example:
+                  message: Message deleted successfully
+        "400":
+          description: Message not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                example:
+                  message: Message not found
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
   /groups/{id}/members:
     post:
-      summary: ""
-      description: ""
+      summary: Add a new member to a group
+      description: Any user belonging to a group can add other users to the group if they are not already there.
       operationId: addToGroup
       parameters:
         - name: id
           in: path
           required: true
+          description: The group id
           schema:
             type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+              properties:
+                username:
+                  type: string
+            example:
+              username: alemilos
       responses:
+        "200":
+          description: Member added to the group successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Member added to the group successfully
+
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: >
+                      error:
+                      * `First Error` - User not found 
+                      * `Second Error` - Group not found 
+                      * `Third Error` - Forbidden
+                    enum:
+                      - User not found
+                      - Group not found
+                      - Forbidden
         "401":
           $ref: "#/components/responses/UnauthorizedError"
     delete:
-      summary: ""
-      description: ""
+      summary: Leave a group
+      description: A user can remove themselves from a group they belong to.
       operationId: leaveGroup
       parameters:
         - name: id
           in: path
           required: true
+          description: The group id
           schema:
             type: string
       responses:
+        "200":
+          description: Left the group successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Left the group successfully
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: >
+                      error:
+                      * `First Error` - Group not found
+                      * `Second Error` - User not part of the group
+                    enum:
+                      - Group not found
+                      - User not part of the group
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
@@ -587,7 +746,7 @@ paths:
 
   /users:
     get:
-      summary: ""
+      summary: get users
       description: ""
       operationId: getUsers
       responses:
@@ -596,7 +755,7 @@ paths:
 
   /groups:
     post:
-      summary: ""
+      summary: create group
       description: ""
       operationId: createGroup
       responses:
