@@ -710,28 +710,70 @@ paths:
 
   /groups/{id}/name:
     put:
-      summary: ""
-      description: ""
+      summary: Change group name
+      description: Update the group name
       operationId: setGroupName
       parameters:
         - name: id
           in: path
           required: true
+          description: The group id
           schema:
             type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+            example:
+              name: I ragazzi del calcetto
       responses:
+        "200":
+          description: Group name changed successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Group name changed successfully.
+
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: >
+                      error:
+                      * `First Error` - Invalid group name 
+                      * `Second Error` - Group not found 
+                      * `Third Error` - Forbidden
+                    enum:
+                      - Invalid group name
+                      - Group not found
+                      - Forbidden
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
   /groups/{id}/photo:
     put:
-      summary: ""
-      description: ""
+      summary: Change group photo
+      description: Update the group photo
       operationId: setGroupPhoto
       parameters:
         - name: id
           in: path
           required: true
+          description: The group id
           schema:
             type: string
       requestBody:
@@ -741,23 +783,105 @@ paths:
             schema:
               $ref: "#/components/schemas/ImageUpload"
       responses:
+        "200":
+          description: Group photo uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Group photo updated successfully
+                  photoPath:
+                    type: string
+                    example: /uploads/groups/1.png
+        "400":
+          description: Invalid input image
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  error:
+                    type: "string"
+                    description: >
+                      error:
+                      * `First Error`  - No file uploaded.
+                      * `Second Error` - Wrong file format. Only jpeg, png and webp are allowed.
+                      * `Third Error`  - File too big. The image can't be bigger than 2Mb.
+                    enum:
+                      - "No file uploaded!"
+                      - "Wrong file format. Only jpeg, png and webp are allowed."
+                      - "File too big. The image can't be bigger than 2Mb."
+                    default: "Wrong file format. Only jpeg, png and webp are allowed."
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
   /users:
     get:
-      summary: get users
-      description: ""
+      summary: Get all users
+      description: Retrieve all users in the application
       operationId: getUsers
       responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    username:
+                      type: string
+                    userId:
+                      type: integer
+                    photo_path:
+                      type: string
+                      nullable: true
+              example:
+                - userId: 1
+                  username:
+                  photo_path: "/uploads/groups/7/photo.png"
+                - userId: 2
+                  username:
+                  photo_path: null
+                - userId: 3
+                  username:
+                  photo_path: "/uploads/groups/7/photo.png"
+                - userId: 4
+                  username:
+                  photo_path: null
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
   /groups:
     post:
-      summary: create group
-      description: ""
+      summary: Create group
+      description: Create a new group
       operationId: createGroup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+            example:
+              name: I ragazzi del calcetto
       responses:
+        "200":
+          description: Group created successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Group created successfully.
         "401":
           $ref: "#/components/responses/UnauthorizedError"
