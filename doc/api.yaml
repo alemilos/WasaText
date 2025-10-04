@@ -29,6 +29,12 @@ components:
                 type: string
                 example: "Unauthorized"
   schemas:
+    Username:
+      type: string
+      example: alemilos
+      pattern: "^[a-zA-Z0-9_]{3,16}$"
+      minLength: 3
+      maxLength: 16
     ImageUpload:
       type: object
       properties:
@@ -47,6 +53,8 @@ security:
 paths:
   /login:
     post:
+      tags:
+        - Auth
       summary: Log in the user
       description: |-
         If the user does not exist, it will be created,
@@ -62,15 +70,11 @@ paths:
               type: object
               properties:
                 username:
-                  type: string
-                  example: AleMilos
-                  pattern: "^[a-zA-Z0-9_]{3,16}$"
-                  minLength: 3
-                  maxLength: 16
+                  $ref: "#/components/schemas/Username"
         required: true
       responses:
-        "201":
-          description: User log-in action successful
+        "200":
+          description: Existing user logged in successfully
           content:
             application/json:
               schema:
@@ -79,12 +83,44 @@ paths:
                   identifier:
                     type: string
                     example: "abcdef012345"
-
+                  username:
+                    type: string
+                    $ref: "#/components/schemas/Username"
+                  photo_path:
+                    type: string
+                    example: /uploads/profiles/10.png
+              example:
+                identifier: "abcdef012345"
+                username: "alemilos"
+                photo_path: "/uploads/profiles/10.png"
+        "201":
+          description: New user created and logged in successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  identifier:
+                    type: string
+                    example: "123456abcdef"
+                  username:
+                    type: string
+                    $ref: "#/components/schemas/Username"
+                  photo_path:
+                    type: string
+                    nullable: true
+                    example: null
+              example:
+                identifier: "123456abcdef"
+                username: "newuser"
+                photo_path: null
   /me/username:
     put:
+      tags:
+        - Users
       summary: Set username for a user
       description:
-        Change the username for a user. The username must be a string of minum
+        Change the username for a user. The username must be a string of minimum
         length 3 and maximum length 16 and contain only alphabet characters, numbers and underscores.
       operationId: setMyUsername
       requestBody:
@@ -95,11 +131,7 @@ paths:
               type: object
               properties:
                 username:
-                  type: string
-                  example: alemilos
-                  pattern: "^[a-zA-Z0-9_]{3,16}$"
-                  minLength: 3
-                  maxLength: 16
+                  $ref: "#/components/schemas/Username"
         required: true
       responses:
         "200":
@@ -122,11 +154,23 @@ paths:
                   message:
                     type: string
                     example: "The username must be between 3 and 16 characters and contain only alphanumeric characters or underscores"
+        "409":
+          description: Username already exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: This username is already taken
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
   /me/photo:
     post:
+      tags:
+        - Users
       summary: Upload a profile image
       description:
         Upload a user's profile image. The image must be of jpeg, png or webp format and its size
@@ -138,6 +182,9 @@ paths:
           multipart/form-data:
             schema:
               $ref: "#/components/schemas/ImageUpload"
+            encoding:
+              file:
+                contentType: image/jpeg, image/png, image/webp
       responses:
         "200":
           description: Profile photo uploaded successfully
@@ -149,7 +196,7 @@ paths:
                   message:
                     type: string
                     example: "Profile photo updated"
-                  photoPath:
+                  photo_path:
                     type: string
                     example: /uploads/profiles/1.png
         "400":
@@ -159,7 +206,7 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  error:
+                  message:
                     type: "string"
                     description: >
                       error:
@@ -167,7 +214,7 @@ paths:
                       * `Second Error` - Wrong file format. Only jpeg, png and webp are allowed.
                       * `Third Error`  - File too big. The image can't be bigger than 2Mb.
                     enum:
-                      - "No file uploaded!"
+                      - "No file uploaded."
                       - "Wrong file format. Only jpeg, png and webp are allowed."
                       - "File too big. The image can't be bigger than 2Mb."
                     default: "Wrong file format. Only jpeg, png and webp are allowed."
@@ -176,6 +223,8 @@ paths:
 
   /conversations:
     get:
+      tags:
+        - Conversations
       summary: Get a user's conversations
       description:
         Get all user's conversations. Each conversation entry will contain the conversation fields and
@@ -257,9 +306,11 @@ paths:
 
   /conversations/{id}:
     get:
+      tags:
+        - Conversations
       summary: Get a conversation by id
       description:
-        Get a conversation with all the messages belonging to it. The converation can either be a
+        Get a conversation with all the messages belonging to it. The conversation can either be a
         private chat or a group chat. Each message entry will contain the message fields and
         the message status fields.
       operationId: getConversation
@@ -337,6 +388,8 @@ paths:
 
   /conversations/{id}/messages:
     post:
+      tags:
+        - Conversations
       summary: Send a message to a conversation
       description: Send a new message to the specified conversation.
       operationId: sendMessage
@@ -382,6 +435,9 @@ paths:
                   description: >
                     Image file to send. Allowed types: jpeg, png, webp.
                     Max size: 2MB.
+            encoding:
+              file:
+                contentType: image/jpeg, image/png, image/webp
       responses:
         "200":
           description: Message sent successfully
@@ -407,7 +463,7 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  error:
+                  message:
                     type: "string"
                     description: >
                       error:
@@ -421,8 +477,10 @@ paths:
 
   /messages/{id}/forward:
     post:
-      summary: Forward a message to a user
-      description: Forward a message to another user
+      tags:
+        - Messages
+      summary: Forward a message to a conversation
+      description: Forward a message to another conversation
       operationId: forwardMessage
       parameters:
         - name: id
@@ -430,8 +488,7 @@ paths:
           required: true
           description: The message id
           schema:
-            type: string
-
+            type: integer
       requestBody:
         required: true
         content:
@@ -439,12 +496,12 @@ paths:
             schema:
               type: object
               required:
-                - userId
+                - conversationId
               properties:
-                userId:
+                conversationId:
                   type: integer
             example:
-              userId: 38
+              conversationId: 38
 
       responses:
         "200":
@@ -458,24 +515,26 @@ paths:
                     type: string
               example:
                 message: Message forwarded successfully
-        "400":
-          description: Invalid user
+        "404":
+          description: Invalid conversation
           content:
             application/json:
               schema:
                 type: "object"
                 properties:
-                  error:
+                  message:
                     type: "string"
-                    description: User not found.
+                    description: Conversation not found.
               example:
-                message: User not found.
+                message: Conversation not found.
 
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
   /messages/{id}/comment:
     post:
+      tags:
+        - Messages
       summary: React to a message
       description: React to a message with an emoji.
       operationId: commentMessage
@@ -485,7 +544,7 @@ paths:
           required: true
           description: The message id
           schema:
-            type: string
+            type: integer
       requestBody:
         description: React to a message with an emoji unicode
         content:
@@ -517,7 +576,7 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  error:
+                  message:
                     description: >
                       error:
                       * `First Error` -Invalid emoji unicode 
@@ -532,6 +591,8 @@ paths:
 
   /messages/{id}/comment/{commentId}:
     delete:
+      tags:
+        - Messages
       summary: Remove message reaction
       description: Delete the emoji reaction from
       operationId: uncommentMessage
@@ -541,13 +602,13 @@ paths:
           required: true
           description: The message id
           schema:
-            type: string
+            type: integer
         - name: commentId
           in: path
           required: true
           description: The comment id
           schema:
-            type: string
+            type: integer
       responses:
         "200":
           description: Message reaction deleted
@@ -560,14 +621,14 @@ paths:
                     type: string
               example:
                 message: Message reaction deleted successfully
-        "400":
+        "404":
           description: Invalid reaction id
           content:
             application/json:
               schema:
                 type: "object"
                 properties:
-                  error:
+                  message:
                     type: "string"
                     description: Reaction not found.
               example:
@@ -578,6 +639,8 @@ paths:
 
   /messages/{id}:
     delete:
+      tags:
+        - Messages
       summary: Delete a message
       description: Delete a message if it wasn't created more than 30 minutes ago.
       operationId: deleteMessage
@@ -587,7 +650,7 @@ paths:
           required: true
           description: The message id
           schema:
-            type: string
+            type: integer
       responses:
         "200":
           description: Message deleted
@@ -600,7 +663,7 @@ paths:
                     type: string
                 example:
                   message: Message deleted successfully
-        "400":
+        "404":
           description: Message not found
           content:
             application/json:
@@ -616,6 +679,8 @@ paths:
 
   /groups/{id}/members:
     post:
+      tags:
+        - Groups
       summary: Add a new member to a group
       description: Any user belonging to a group can add other users to the group if they are not already there.
       operationId: addToGroup
@@ -625,7 +690,7 @@ paths:
           required: true
           description: The group id
           schema:
-            type: string
+            type: integer
       requestBody:
         required: true
         content:
@@ -636,9 +701,7 @@ paths:
                 - username
               properties:
                 username:
-                  type: string
-            example:
-              username: alemilos
+                  $ref: "#/components/schemas/Username"
       responses:
         "200":
           description: Member added to the group successfully.
@@ -656,20 +719,32 @@ paths:
               schema:
                 type: object
                 properties:
-                  error:
+                  message:
+                    type: string
+                    description: Forbidden
+              example:
+                message: Forbidden
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
                     type: string
                     description: >
                       error:
                       * `First Error` - User not found 
-                      * `Second Error` - Group not found 
-                      * `Third Error` - Forbidden
+                      * `Second Error` - Group not found
                     enum:
                       - User not found
                       - Group not found
-                      - Forbidden
         "401":
           $ref: "#/components/responses/UnauthorizedError"
     delete:
+      tags:
+        - Groups
       summary: Leave a group
       description: A user can remove themselves from a group they belong to.
       operationId: leaveGroup
@@ -679,7 +754,7 @@ paths:
           required: true
           description: The group id
           schema:
-            type: string
+            type: integer
       responses:
         "200":
           description: Left the group successfully.
@@ -696,20 +771,30 @@ paths:
               schema:
                 type: object
                 properties:
-                  error:
+                  message:
                     type: string
-                    description: >
-                      error:
-                      * `First Error` - Group not found
-                      * `Second Error` - User not part of the group
-                    enum:
-                      - Group not found
-                      - User not part of the group
+                    description: User not part of the group
+              example:
+                message: User not part of the group
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Group not found
+              example:
+                message: Group not found
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
   /groups/{id}/name:
     put:
+      tags:
+        - Groups
       summary: Change group name
       description: Update the group name
       operationId: setGroupName
@@ -719,7 +804,7 @@ paths:
           required: true
           description: The group id
           schema:
-            type: string
+            type: integer
       requestBody:
         required: true
         content:
@@ -750,22 +835,34 @@ paths:
               schema:
                 type: object
                 properties:
-                  error:
+                  message:
                     type: string
                     description: >
                       error:
                       * `First Error` - Invalid group name 
-                      * `Second Error` - Group not found 
-                      * `Third Error` - Forbidden
+                      * `Second Error` - Forbidden
                     enum:
                       - Invalid group name
-                      - Group not found
                       - Forbidden
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Group not found
+              example:
+                message: Group not found
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
   /groups/{id}/photo:
     put:
+      tags:
+        - Groups
       summary: Change group photo
       description: Update the group photo
       operationId: setGroupPhoto
@@ -775,13 +872,16 @@ paths:
           required: true
           description: The group id
           schema:
-            type: string
+            type: integer
       requestBody:
         required: true
         content:
           multipart/form-data:
             schema:
               $ref: "#/components/schemas/ImageUpload"
+            encoding:
+              file:
+                contentType: image/jpeg, image/png, image/webp
       responses:
         "200":
           description: Group photo uploaded successfully
@@ -793,7 +893,7 @@ paths:
                   message:
                     type: string
                     example: Group photo updated successfully
-                  photoPath:
+                  photo_path:
                     type: string
                     example: /uploads/groups/1.png
         "400":
@@ -803,7 +903,7 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  error:
+                  message:
                     type: "string"
                     description: >
                       error:
@@ -811,7 +911,7 @@ paths:
                       * `Second Error` - Wrong file format. Only jpeg, png and webp are allowed.
                       * `Third Error`  - File too big. The image can't be bigger than 2Mb.
                     enum:
-                      - "No file uploaded!"
+                      - "No file uploaded."
                       - "Wrong file format. Only jpeg, png and webp are allowed."
                       - "File too big. The image can't be bigger than 2Mb."
                     default: "Wrong file format. Only jpeg, png and webp are allowed."
@@ -820,6 +920,8 @@ paths:
 
   /users:
     get:
+      tags:
+        - Users
       summary: Get all users
       description: Retrieve all users in the application
       operationId: getUsers
@@ -842,24 +944,26 @@ paths:
                       nullable: true
               example:
                 - userId: 1
-                  username:
+                  username: alemilos
                   photo_path: "/uploads/groups/7/photo.png"
                 - userId: 2
-                  username:
+                  username: mistermaster
                   photo_path: null
                 - userId: 3
-                  username:
+                  username: johndoe
                   photo_path: "/uploads/groups/7/photo.png"
                 - userId: 4
-                  username:
+                  username: viral_man
                   photo_path: null
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
   /groups:
     post:
+      tags:
+        - Groups
       summary: Create group
-      description: Create a new group
+      description: Create a new group with a name and members.
       operationId: createGroup
       requestBody:
         required: true
@@ -872,16 +976,36 @@ paths:
               properties:
                 name:
                   type: string
+                members:
+                  type: array
+                  description: List of userIds to add to the group
+                  items:
+                    type: integer
             example:
               name: I ragazzi del calcetto
+              members: [2, 6, 8]
       responses:
         "200":
-          description: Group created successfully.
+          description: Group created successfully
           content:
             application/json:
               schema:
                 type: object
-                example:
-                  message: Group created successfully.
+                properties:
+                  message:
+                    type: string
+                    example: "Group created successfully."
+                  groupId:
+                    type: integer
+                  membersAdded:
+                    type: array
+                    items:
+                      type: integer
+                    example: [2, 3, 5]
+                  membersIgnored:
+                    type: array
+                    items:
+                      type: integer
+                    example: [99] # users not found
         "401":
           $ref: "#/components/responses/UnauthorizedError"
