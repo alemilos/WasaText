@@ -84,7 +84,6 @@ paths:
                     type: string
                     example: "abcdef012345"
                   username:
-                    type: string
                     $ref: "#/components/schemas/Username"
                   photo_path:
                     type: string
@@ -104,7 +103,6 @@ paths:
                     type: string
                     example: "123456abcdef"
                   username:
-                    type: string
                     $ref: "#/components/schemas/Username"
                   photo_path:
                     type: string
@@ -214,9 +212,9 @@ paths:
                       * `Second Error` - Wrong file format. Only jpeg, png and webp are allowed.
                       * `Third Error`  - File too big. The image can't be bigger than 2Mb.
                     enum:
-                      - "No file uploaded."
-                      - "Wrong file format. Only jpeg, png and webp are allowed."
-                      - "File too big. The image can't be bigger than 2Mb."
+                      - no_file_uploaded
+                      - wrong_file_format
+                      - file_too_big
                     default: "Wrong file format. Only jpeg, png and webp are allowed."
         "401":
           $ref: "#/components/responses/UnauthorizedError"
@@ -236,70 +234,74 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    conversationId:
-                      type: integer
-                    type:
-                      type: string
-                      enum: [private, group]
-                    name:
-                      type: string
-                    photo_path:
-                      type: string
-                      nullable: true
-                    created_by:
-                      type: integer
-                    created_at:
-                      type: string
-                      format: date-time
-                    lastMessage:
+                type: object
+                properties:
+                  conversations:
+                    type: array
+                    items:
                       type: object
-                      nullable: true
                       properties:
-                        id:
+                        conversationId:
                           type: integer
                         type:
                           type: string
-                          enum: [text, image]
-                        is_forwarded:
-                          type: boolean
-                        author_id:
-                          type: integer
-                        content:
+                          enum: [private, group]
+                        name:
                           type: string
+                        photo_path:
+                          type: string
+                          nullable: true
+                        created_by:
+                          type: integer
                         created_at:
                           type: string
                           format: date-time
+                        lastMessage:
+                          type: object
+                          nullable: true
+                          properties:
+                            id:
+                              type: integer
+                            type:
+                              type: string
+                              enum: [text, image]
+                            is_forwarded:
+                              type: boolean
+                            author_id:
+                              type: integer
+                            content:
+                              type: string
+                            created_at:
+                              type: string
+                              format: date-time
               example:
-                - conversationId: 7
-                  type: group
-                  name: Partite Calcio
-                  photo_path: "/uploads/groups/7/photo.png"
-                  created_by: 31
-                  created_at: "2025-09-29T14:48:00Z"
-                  lastMessage:
-                    id: 239
-                    type: text
-                    is_forwarded: false
-                    author_id: 20
-                    content: "Va bene ci sono per stasera, ci vediamo!"
-                    created_at: "2025-09-28T16:30:00Z"
-                - conversationId: 12
-                  type: private
-                  name: "Edoardo"
-                  photo_path: null
-                  created_by: 31
-                  created_at: "2025-09-25T09:20:00Z"
-                  lastMessage:
-                    id: 312
-                    type: text
-                    is_forwarded: false
-                    author_id: 45
-                    content: "Ci sentiamo più tardi!"
-                    created_at: "2025-09-28T18:10:00Z"
+                conversations:
+                  - conversationId: 7
+                    type: group
+                    name: Partite Calcio
+                    photo_path: "/uploads/groups/7/photo.png"
+                    created_by: 31
+                    created_at: "2025-09-29T14:48:00Z"
+                    lastMessage:
+                      id: 239
+                      type: text
+                      is_forwarded: false
+                      author_id: 20
+                      content: "Va bene ci sono per stasera, ci vediamo!"
+                      created_at: "2025-09-28T16:30:00Z"
+                  - conversationId: 12
+                    type: private
+                    name: "Edoardo"
+                    photo_path: null
+                    created_by: 31
+                    created_at: "2025-09-25T09:20:00Z"
+                    lastMessage:
+                      id: 312
+                      type: text
+                      is_forwarded: false
+                      author_id: 45
+                      content: "Ci sentiamo più tardi!"
+                      created_at: "2025-09-28T18:10:00Z"
 
         "401":
           $ref: "#/components/responses/UnauthorizedError"
@@ -327,62 +329,66 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    messageId:
-                      type: integer
-                    type:
-                      type: string
-                      enum: [text, image]
-                    is_forwarded:
-                      type: boolean
-                    content:
-                      type: string
-                    author_id:
-                      type: integer
-                    created_at:
-                      type: string
-                      format: date-time
-                    messageStatus:
+                type: object
+                properties:
+                  messages:
+                    type: array
+                    items:
                       type: object
                       properties:
-                        status:
+                        messageId:
+                          type: integer
+                        type:
                           type: string
-                          enum: [received, read]
-                        members:
-                          type: array
-                          items:
-                            type: integer
+                          enum: [text, image]
+                        is_forwarded:
+                          type: boolean
+                        content:
+                          type: string
+                        author_id:
+                          type: integer
+                        created_at:
+                          type: string
+                          format: date-time
+                        messageStatus:
+                          type: object
+                          properties:
+                            status:
+                              type: string
+                              enum: [received, read]
+                            members:
+                              type: array
+                              items:
+                                type: integer
               example:
-                - messageId: 65
-                  type: image
-                  is_forwarded: true
-                  content: "/uploads/groups/7/images/photo123.jpeg"
-                  author_id: 3
-                  created_at: "2025-09-29T14:48:00Z"
-                  messageStatus:
-                    status: read
-                    members: [1, 2, 3]
-                - messageId: 66
-                  type: text
-                  is_forwarded: false
-                  content: "AHHAAHH che ridere!"
-                  author_id: 1
-                  created_at: "2025-09-29T15:00:00Z"
-                  messageStatus:
-                    status: received
-                    members: [1, 3]
-                - messageId: 67
-                  type: text
-                  is_forwarded: false
-                  content: "No vabbe troppo divertente"
-                  author_id: 2
-                  created_at: "2025-09-29T15:05:00Z"
-                  messageStatus:
-                    status: received
-                    members: [3]
+                messages:
+                  - messageId: 65
+                    type: image
+                    is_forwarded: true
+                    content: "/uploads/groups/7/images/photo123.jpeg"
+                    author_id: 3
+                    created_at: "2025-09-29T14:48:00Z"
+                    messageStatus:
+                      status: read
+                      members: [1, 2, 3]
+                  - messageId: 66
+                    type: text
+                    is_forwarded: false
+                    content: "AHHAAHH che ridere!"
+                    author_id: 1
+                    created_at: "2025-09-29T15:00:00Z"
+                    messageStatus:
+                      status: received
+                      members: [1, 3]
+                  - messageId: 67
+                    type: text
+                    is_forwarded: false
+                    content: "No vabbe troppo divertente"
+                    author_id: 2
+                    created_at: "2025-09-29T15:05:00Z"
+                    messageStatus:
+                      status: received
+                      members: [3]
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
@@ -470,8 +476,8 @@ paths:
                       * `First Error` - Wrong file format. Only jpeg, png and webp are allowed.
                       * `Second Error`  - File too big. The image can't be bigger than 2Mb.
                     enum:
-                      - "Wrong file format. Only jpeg, png and webp are allowed."
-                      - "File too big. The image can't be bigger than 2Mb."
+                      - wrong_file_format
+                      - file_too_big
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
@@ -555,7 +561,7 @@ paths:
                 emoji:
                   type: string
                   example: U+2764
-                  pattern: "(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])"
+                  pattern: "(\\\\u00a9|\\\\u00ae|[\\\\u2000-\\\\u3300]|\\\\ud83c[\\\\ud000-\\\\udfff]|\\\\ud83d[\\\\ud000-\\\\udfff]|\\\\ud83e[\\\\ud000-\\\\udfff])"
         required: true
       responses:
         "200":
@@ -582,8 +588,8 @@ paths:
                       * `First Error` -Invalid emoji unicode 
                       * `Second Error`  - You have already reacted to this message
                     enum:
-                      - "Invalid emoji unicode"
-                      - "You have already reacted to this message"
+                      - invalid_emoji_unicode
+                      - already_reacted_to_message
                 example:
                   message: Invalid emoji unicode
         "401":
@@ -678,19 +684,19 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
 
   /groups/{id}/members:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: The group id
+        schema:
+          type: integer
     post:
       tags:
         - Groups
       summary: Add a new member to a group
       description: Any user belonging to a group can add other users to the group if they are not already there.
       operationId: addToGroup
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: The group id
-          schema:
-            type: integer
       requestBody:
         required: true
         content:
@@ -738,8 +744,8 @@ paths:
                       * `First Error` - User not found 
                       * `Second Error` - Group not found
                     enum:
-                      - User not found
-                      - Group not found
+                      - user_not_found
+                      - group_not_found
         "401":
           $ref: "#/components/responses/UnauthorizedError"
     delete:
@@ -748,13 +754,6 @@ paths:
       summary: Leave a group
       description: A user can remove themselves from a group they belong to.
       operationId: leaveGroup
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: The group id
-          schema:
-            type: integer
       responses:
         "200":
           description: Left the group successfully.
@@ -842,8 +841,8 @@ paths:
                       * `First Error` - Invalid group name 
                       * `Second Error` - Forbidden
                     enum:
-                      - Invalid group name
-                      - Forbidden
+                      - invalid_group_name
+                      - forbidden
         "404":
           description: Not Found
           content:
@@ -911,9 +910,9 @@ paths:
                       * `Second Error` - Wrong file format. Only jpeg, png and webp are allowed.
                       * `Third Error`  - File too big. The image can't be bigger than 2Mb.
                     enum:
-                      - "No file uploaded."
-                      - "Wrong file format. Only jpeg, png and webp are allowed."
-                      - "File too big. The image can't be bigger than 2Mb."
+                      - no_file_uploaded
+                      - wront_file_format
+                      - file_too_big
                     default: "Wrong file format. Only jpeg, png and webp are allowed."
         "401":
           $ref: "#/components/responses/UnauthorizedError"
@@ -931,30 +930,34 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    username:
-                      type: string
-                    userId:
-                      type: integer
-                    photo_path:
-                      type: string
-                      nullable: true
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        username:
+                          $ref: "#/components/schemas/Username"
+                        userId:
+                          type: integer
+                        photo_path:
+                          type: string
+                          nullable: true
               example:
-                - userId: 1
-                  username: alemilos
-                  photo_path: "/uploads/groups/7/photo.png"
-                - userId: 2
-                  username: mistermaster
-                  photo_path: null
-                - userId: 3
-                  username: johndoe
-                  photo_path: "/uploads/groups/7/photo.png"
-                - userId: 4
-                  username: viral_man
-                  photo_path: null
+                users:
+                  - userId: 1
+                    username: alemilos
+                    photo_path: "/uploads/groups/7/photo.png"
+                  - userId: 2
+                    username: mistermaster
+                    photo_path: null
+                  - userId: 3
+                    username: johndoe
+                    photo_path: "/uploads/groups/7/photo.png"
+                  - userId: 4
+                    username: viral_man
+                    photo_path: null
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
