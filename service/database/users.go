@@ -6,13 +6,13 @@ import (
 )
 
 type User struct {
-	ID        int64      `json:"id"`
-	Username  string     `json:"username"`
-	PhotoPath *string    `json:"photo_path,omitempty"`
-	CreatedAt time.Time  `json:"created_at"`
+	ID        int64     `json:"id"`
+	Username  string    `json:"username"`
+	PhotoPath *string   `json:"photo_path,omitempty"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
-// Create a user  
+// Create a user
 func (db *appdbimpl) CreateUser(username string, photoPath *string) (*User, error) {
 	res, err := db.c.Exec(`INSERT INTO users (username, photo_path) VALUES (?, ?)`, username, photoPath)
 	if err != nil {
@@ -20,7 +20,7 @@ func (db *appdbimpl) CreateUser(username string, photoPath *string) (*User, erro
 	}
 
 	id, _ := res.LastInsertId()
-	return db.GetUser(id)
+	return db.GetUserById(id)
 }
 
 // Set a new username for a given user, by user id
@@ -36,7 +36,7 @@ func (db *appdbimpl) SetProfilePhoto(userID int64, photoPath string) error {
 }
 
 // Get a user by id
-func (db *appdbimpl) GetUser(id int64) (*User, error) {
+func (db *appdbimpl) GetUserById(id int64) (*User, error) {
 	var u User
 	err := db.c.QueryRow(`SELECT id, username, photo_path, created_at FROM users WHERE id=?`, id).
 		Scan(&u.ID, &u.Username, &u.PhotoPath, &u.CreatedAt)
@@ -64,7 +64,7 @@ func (db *appdbimpl) GetUserByUsername(username string) (*User, error) {
 	return &u, nil
 }
 
-// Get all the users in the database 
+// Get all the users in the database
 func (db *appdbimpl) GetUsers() ([]User, error) {
 	rows, err := db.c.Query(`SELECT id, username, photo_path, created_at FROM users`)
 	if err != nil {
@@ -80,5 +80,10 @@ func (db *appdbimpl) GetUsers() ([]User, error) {
 		}
 		users = append(users, u)
 	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
 	return users, nil
 }

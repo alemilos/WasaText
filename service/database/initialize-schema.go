@@ -15,10 +15,10 @@ func InitializeSchema(db *sql.DB) error {
 			photo_path TEXT,
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 		);`,
-		// Add here other table cretions 
+		// Add here other table cretions
 	}
 
-	// all statements are executed in one transaction 
+	// all statements are executed in one transaction
 	tx, err := db.Begin()
 	if err != nil {
 		return fmt.Errorf("begin tx: %w", err)

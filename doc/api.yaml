@@ -80,16 +80,16 @@ paths:
               schema:
                 type: object
                 properties:
-                  identifier:
-                    type: string
-                    example: "abcdef012345"
+                  id:
+                    type: integer
+                    example: 5
                   username:
                     $ref: "#/components/schemas/Username"
                   photo_path:
                     type: string
                     example: /uploads/profiles/10.png
               example:
-                identifier: "abcdef012345"
+                id: 10
                 username: "alemilos"
                 photo_path: "/uploads/profiles/10.png"
         "201":
@@ -99,9 +99,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  identifier:
-                    type: string
-                    example: "123456abcdef"
+                  id:
+                    type: integer
+                    example: 5
                   username:
                     $ref: "#/components/schemas/Username"
                   photo_path:
@@ -109,7 +109,7 @@ paths:
                     nullable: true
                     example: null
               example:
-                identifier: "123456abcdef"
+                id: 6
                 username: "newuser"
                 photo_path: null
   /me/username:
@@ -120,7 +120,7 @@ paths:
       description:
         Change the username for a user. The username must be a string of minimum
         length 3 and maximum length 16 and contain only alphabet characters, numbers and underscores.
-      operationId: setMyUsername
+      operationId: setMyUserName
       requestBody:
         description: Update username if it doesn't already exist
         content:

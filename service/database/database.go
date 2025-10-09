@@ -42,7 +42,7 @@ type AppDatabase interface {
 	CreateUser(username string, photoPath *string) (*User, error)
 	SetUsername(userID int64, newName string) error
 	SetProfilePhoto(userID int64, photoPath string) error
-	GetUser(id int64) (*User, error)
+	GetUserById(id int64) (*User, error)
 	GetUserByUsername(username string) (*User, error)
 	GetUsers() ([]User, error)
 
@@ -76,8 +76,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 		return nil, fmt.Errorf("initialize schema: %w", err)
 	}
 
-
-	return &appdbimpl{ c: db}, nil
+	return &appdbimpl{c: db}, nil
 }
 
 func (db *appdbimpl) Ping() error {

@@ -7,6 +7,7 @@ Each value here should be assumed valid only per request only, with some excepti
 package reqcontext
 
 import (
+	"git.sapienzaapps.it/fantasticcoffee/fantastic-coffee-decaffeinated/service/database"
 	"github.com/gofrs/uuid"
 	"github.com/sirupsen/logrus"
 )
@@ -18,4 +19,7 @@ type RequestContext struct {
 
 	// Logger is a custom field logger for the request
 	Logger logrus.FieldLogger
+
+	// User retrieved from the Authorization Bearer (id)
+	User *database.User
 }

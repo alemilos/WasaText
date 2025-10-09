@@ -14,14 +14,11 @@ type loginRequest struct {
 type loginResponse struct {
 	ID        int64   `json:"id"`
 	Username  string  `json:"username"`
-	PhotoPath *string `json:"photo_path,omitempty"`
+	PhotoPath *string `json:"photo_path"`
 }
-
 
 // login endpoint handler
 func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	rt.baseLogger.Info("Handling /login request")
-
 	// Decode request body
 	var req loginRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -68,4 +65,4 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 		Username:  newUser.Username,
 		PhotoPath: newUser.PhotoPath,
 	})
-}	
+}
