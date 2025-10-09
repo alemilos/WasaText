@@ -20,7 +20,9 @@ type loginResponse struct {
 
 // login endpoint handler
 func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-// Decode request body
+	rt.baseLogger.Info("Handling /login request")
+
+	// Decode request body
 	var req loginRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "invalid request body", http.StatusBadRequest)
