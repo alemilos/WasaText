@@ -38,8 +38,13 @@ import (
 
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
-	GetName() (string, error)
-	SetName(name string) error
+	// USERS
+	CreateUser(username string, photoPath *string) (*User, error)
+	SetUsername(userID int64, newName string) error
+	SetProfilePhoto(userID int64, photoPath string) error
+	GetUser(id int64) (*User, error)
+	GetUserByUsername(username string) (*User, error)
+	GetUsers() ([]User, error)
 
 	Ping() error
 }
@@ -66,9 +71,13 @@ func New(db *sql.DB) (AppDatabase, error) {
 		}
 	}
 
-	return &appdbimpl{
-		c: db,
-	}, nil
+	// chiama la funzione che crea le tabelle se mancano
+	if err := InitializeSchema(db); err != nil {
+		return nil, fmt.Errorf("initialize schema: %w", err)
+	}
+
+
+	return &appdbimpl{ c: db}, nil
 }
 
 func (db *appdbimpl) Ping() error {
