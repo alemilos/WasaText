@@ -32,7 +32,7 @@ components:
     Username:
       type: string
       example: alemilos
-      pattern: "^[a-zA-Z0-9_]{3,16}$"
+      pattern: "^[a-zA-Z0-9_]*[a-zA-Z][a-zA-Z0-9_]*$"
       minLength: 3
       maxLength: 16
     ImageUpload:
@@ -87,11 +87,11 @@ paths:
                     $ref: "#/components/schemas/Username"
                   photo_path:
                     type: string
-                    example: /uploads/profiles/10.png
+                    example: /tmp/storage/profiles/10.png
               example:
                 id: 10
                 username: "alemilos"
-                photo_path: "/uploads/profiles/10.png"
+                photo_path: "/tmp/storage/profiles/10.png"
         "201":
           description: New user created and logged in successfully
           content:
@@ -196,7 +196,7 @@ paths:
                     example: "Profile photo updated"
                   photo_path:
                     type: string
-                    example: /uploads/profiles/1.png
+                    example: /tmp/storage/profiles/1.png
         "400":
           description: Invalid input image
           content:
@@ -279,7 +279,7 @@ paths:
                   - conversationId: 7
                     type: group
                     name: Partite Calcio
-                    photo_path: "/uploads/groups/7/photo.png"
+                    photo_path: "/tmp/storage/groups/7/photo.png"
                     created_by: 31
                     created_at: "2025-09-29T14:48:00Z"
                     lastMessage:
@@ -365,7 +365,7 @@ paths:
                   - messageId: 65
                     type: image
                     is_forwarded: true
-                    content: "/uploads/groups/7/images/photo123.jpeg"
+                    content: "/tmp/storage/groups/7/images/photo123.jpeg"
                     author_id: 3
                     created_at: "2025-09-29T14:48:00Z"
                     messageStatus:
@@ -894,7 +894,7 @@ paths:
                     example: Group photo updated successfully
                   photo_path:
                     type: string
-                    example: /uploads/groups/1.png
+                    example: /tmp/storage/groups/1.png
         "400":
           description: Invalid input image
           content:
@@ -948,13 +948,13 @@ paths:
                 users:
                   - userId: 1
                     username: alemilos
-                    photo_path: "/uploads/groups/7/photo.png"
+                    photo_path: "/tmp/storage/groups/7/photo.png"
                   - userId: 2
                     username: mistermaster
                     photo_path: null
                   - userId: 3
                     username: johndoe
-                    photo_path: "/uploads/groups/7/photo.png"
+                    photo_path: "/tmp/storage/groups/7/photo.png"
                   - userId: 4
                     username: viral_man
                     photo_path: null

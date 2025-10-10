@@ -52,6 +52,8 @@ type Config struct {
 
 	// Database is the instance of database.AppDatabase where data are saved
 	Database database.AppDatabase
+
+	StoragePath string
 }
 
 // Router is the package API interface representing an API handler builder
@@ -72,17 +74,22 @@ func New(cfg Config) (Router, error) {
 	if cfg.Database == nil {
 		return nil, errors.New("database is required")
 	}
+	if cfg.StoragePath == "" {
+		cfg.StoragePath = "/tmp/storage"
+	}
 
 	// Create a new router where we will register HTTP endpoints. The server will pass requests to this router to be
 	// handled.
 	router := httprouter.New()
 	router.RedirectTrailingSlash = false
 	router.RedirectFixedPath = false
+	router.ServeFiles("/uploads/*filepath", http.Dir(cfg.StoragePath))
 
 	return &_router{
-		router:     router,
-		baseLogger: cfg.Logger,
-		db:         cfg.Database,
+		router:      router,
+		baseLogger:  cfg.Logger,
+		db:          cfg.Database,
+		storagePath: cfg.StoragePath,
 	}, nil
 }
 
@@ -94,4 +101,6 @@ type _router struct {
 	baseLogger logrus.FieldLogger
 
 	db database.AppDatabase
+
+	storagePath string
 }

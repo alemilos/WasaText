@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"git.sapienzaapps.it/fantasticcoffee/fantastic-coffee-decaffeinated/service/api/reqcontext"
+	"git.sapienzaapps.it/fantasticcoffee/fantastic-coffee-decaffeinated/service/validation"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -17,12 +18,13 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 	// Decode request body
 	var req setMyUserNameRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "invalid request body", http.StatusBadRequest)
+		http.Error(w, ErrorMessage(InvalidRequestBody), http.StatusBadRequest)
 		return
 	}
 
-	if req.Username == "" {
-		http.Error(w, "username is required", http.StatusBadRequest)
+	// === Validate the username ===
+	if err := validation.ValidateUsername(req.Username); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -30,20 +32,20 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 	existingUser, err := rt.db.GetUserByUsername(req.Username)
 	if err != nil && err.Error() != "sql: no rows in result set" {
 		// unexpected DB error
-		http.Error(w, "database error: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, ErrorMessage(InternalServerError), http.StatusInternalServerError)
 		return
 	}
 
 	// === Requester is not the same as the username's owner ===
 	if existingUser != nil && existingUser.ID != ctx.User.ID {
-		http.Error(w, "username already taken", http.StatusConflict)
+		http.Error(w, ErrorMessage("Username already taken"), http.StatusConflict)
 		return
 	}
 
 	// === Update the username ===
 	err = rt.db.SetUsername(ctx.User.ID, req.Username)
 	if err != nil {
-		http.Error(w, "could not update username: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, ErrorMessage("Could not update username"), http.StatusInternalServerError)
 		return
 	}
 
