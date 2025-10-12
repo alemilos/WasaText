@@ -220,6 +220,94 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
 
   /conversations:
+    post:
+      tags:
+        - Conversations
+      summary: Create a new conversation
+      description: |
+        Create a new private conversation.  
+        If a private conversation with the specified user already exists, the existing one is returned.
+      operationId: createConversation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - type: object
+                  required:
+                    - recipientId
+                  properties:
+                    recipientId:
+                      type: integer
+                      description: The ID of the recipient user.
+              example:
+                recipientId: 23
+      responses:
+        "201":
+          description: Conversation created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  conversationId:
+                    type: integer
+                  type:
+                    type: string
+                  created_by:
+                    type: integer
+                  created_at:
+                    type: string
+                    format: date-time
+              example:
+                conversationId: 18
+                type: private
+                created_by: 31
+                created_at: "2025-10-12T15:42:00Z"
+        "200":
+          description: Existing conversation returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  conversationId:
+                    type: integer
+                  type:
+                    type: string
+                  created_by:
+                    type: integer
+                  created_at:
+                    type: string
+                    format: date-time
+              example:
+                conversationId: 7
+                type: private
+                created_by: 31
+                created_at: "2025-09-25T09:20:00Z"
+        "400":
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Missing recipient id"
+        "404":
+          description: Recipient not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User not found"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
     get:
       tags:
         - Conversations
