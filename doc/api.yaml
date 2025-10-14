@@ -857,6 +857,17 @@ paths:
                     type: string
                 example:
                   message: Message not found
+        "403":
+          description: Message was created more than 30 minutes ago
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                example:
+                  message: Cannot delete messages older than 30 minutes
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 

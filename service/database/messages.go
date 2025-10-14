@@ -108,6 +108,18 @@ func (db *appdbimpl) GetLastMessageByConversation(conversationID int64) (*Messag
 	return &m, nil
 }
 
+func (db *appdbimpl) DeleteMessage(messageID int64) error {
+	res, err := db.c.Exec(`DELETE FROM messages WHERE id = ?`, messageID)
+	if err != nil {
+		return err
+	}
+	rows, err := res.RowsAffected()
+	if err == nil && rows == 0 {
+		return sql.ErrNoRows
+	}
+	return err
+}
+
 // Helper to convert bool <-> int for SQLite
 func boolToInt(b bool) int {
 	if b {

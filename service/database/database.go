@@ -63,6 +63,7 @@ type AppDatabase interface {
 	GetMessagesByConversation(conversationID int64) ([]Message, error)
 	GetLastMessageByConversation(conversationID int64) (*Message, error)
 	UpdateMessageContent(messageID int64, content string) error
+	DeleteMessage(id int64) error
 
 	// Message Read
 	CreateMessageRead(messageID, memberID int64) error
