@@ -600,6 +600,7 @@ paths:
       description: |
         Marks one or more messages as read for the authenticated user.  
         The user must belong to the specified conversation.
+      operationId: readMessages
       tags:
         - Conversations
       parameters:
