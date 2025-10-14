@@ -87,11 +87,11 @@ paths:
                     $ref: "#/components/schemas/Username"
                   photo_path:
                     type: string
-                    example: /tmp/storage/profiles/10.png
+                    example: profiles/10.png
               example:
                 id: 10
                 username: "alemilos"
-                photo_path: "/tmp/storage/profiles/10.png"
+                photo_path: "profiles/10.png"
         "201":
           description: New user created and logged in successfully
           content:
@@ -196,7 +196,7 @@ paths:
                     example: "Profile photo updated"
                   photo_path:
                     type: string
-                    example: /tmp/storage/profiles/1.png
+                    example: profiles/1.png
         "400":
           description: Invalid input image
           content:
@@ -236,13 +236,13 @@ paths:
               oneOf:
                 - type: object
                   required:
-                    - recipientId
+                    - recipient_id
                   properties:
-                    recipientId:
+                    recipient_id:
                       type: integer
                       description: The ID of the recipient user.
               example:
-                recipientId: 23
+                recipient_id: 23
       responses:
         "201":
           description: Conversation created successfully
@@ -251,7 +251,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  conversationId:
+                  conversation_id:
                     type: integer
                   type:
                     type: string
@@ -261,7 +261,7 @@ paths:
                     type: string
                     format: date-time
               example:
-                conversationId: 18
+                conversation_id: 18
                 type: private
                 created_by: 31
                 created_at: "2025-10-12T15:42:00Z"
@@ -272,7 +272,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  conversationId:
+                  conversation_id:
                     type: integer
                   type:
                     type: string
@@ -282,7 +282,7 @@ paths:
                     type: string
                     format: date-time
               example:
-                conversationId: 7
+                conversation_id: 7
                 type: private
                 created_by: 31
                 created_at: "2025-09-25T09:20:00Z"
@@ -329,7 +329,7 @@ paths:
                     items:
                       type: object
                       properties:
-                        conversationId:
+                        conversation_id:
                           type: integer
                         type:
                           type: string
@@ -344,7 +344,7 @@ paths:
                         created_at:
                           type: string
                           format: date-time
-                        lastMessage:
+                        last_message:
                           type: object
                           nullable: true
                           properties:
@@ -364,26 +364,26 @@ paths:
                               format: date-time
               example:
                 conversations:
-                  - conversationId: 7
+                  - conversation_id: 7
                     type: group
                     name: Partite Calcio
-                    photo_path: "/tmp/storage/groups/7/photo.png"
+                    photo_path: "groups/7/photo.png"
                     created_by: 31
                     created_at: "2025-09-29T14:48:00Z"
-                    lastMessage:
+                    last_message:
                       id: 239
                       type: text
                       is_forwarded: false
                       author_id: 20
                       content: "Va bene ci sono per stasera, ci vediamo!"
                       created_at: "2025-09-28T16:30:00Z"
-                  - conversationId: 12
+                  - conversation_id: 12
                     type: private
                     name: "Edoardo"
                     photo_path: null
                     created_by: 31
                     created_at: "2025-09-25T09:20:00Z"
-                    lastMessage:
+                    last_message:
                       id: 312
                       type: text
                       is_forwarded: false
@@ -424,7 +424,7 @@ paths:
                     items:
                       type: object
                       properties:
-                        messageId:
+                        message_id:
                           type: integer
                         type:
                           type: string
@@ -438,7 +438,7 @@ paths:
                         created_at:
                           type: string
                           format: date-time
-                        messageStatus:
+                        message_status:
                           type: object
                           properties:
                             status:
@@ -450,35 +450,48 @@ paths:
                                 type: integer
               example:
                 messages:
-                  - messageId: 65
+                  - message_id: 65
                     type: image
                     is_forwarded: true
-                    content: "/tmp/storage/groups/7/images/photo123.jpeg"
+                    content: "groups/7/images/photo123.jpeg"
                     author_id: 3
                     created_at: "2025-09-29T14:48:00Z"
-                    messageStatus:
+                    message_status:
                       status: read
                       members: [1, 2, 3]
-                  - messageId: 66
+                  - message_id: 66
                     type: text
                     is_forwarded: false
                     content: "AHHAAHH che ridere!"
                     author_id: 1
                     created_at: "2025-09-29T15:00:00Z"
-                    messageStatus:
+                    message_status:
                       status: received
                       members: [1, 3]
-                  - messageId: 67
+                  - message_id: 67
                     type: text
                     is_forwarded: false
                     content: "No vabbe troppo divertente"
                     author_id: 2
                     created_at: "2025-09-29T15:05:00Z"
-                    messageStatus:
+                    message_status:
                       status: received
                       members: [3]
         "401":
           $ref: "#/components/responses/UnauthorizedError"
+
+        "403":
+          description: The user doesn't belong to the conversation
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: "string"
+                    description: The user doesn't belong to this conversation.
+              example:
+                message: User doesn't belong to the conversation
 
   /conversations/{id}/messages:
     post:
@@ -540,7 +553,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  messageId:
+                  message_id:
                     type: integer
                   type:
                     type: string
@@ -566,6 +579,81 @@ paths:
                     enum:
                       - wrong_file_format
                       - file_too_big
+        "403":
+          description: The user doesn't belong to the conversation
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: "string"
+                    description: The user doesn't belong to this conversation.
+              example:
+                message: User doesn't belong to the conversation
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /conversations/{id}/read:
+    post:
+      summary: Mark messages as read in a conversation
+      description: |
+        Marks one or more messages as read for the authenticated user.  
+        The user must belong to the specified conversation.
+      tags:
+        - Conversations
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the conversation
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - messages
+              properties:
+                messages:
+                  type: array
+                  items:
+                    type: integer
+                    format: int64
+                  example: [12, 13, 14]
+      responses:
+        "204":
+          description: Messages successfully marked as read (no content)
+
+        "400":
+          description: Invalid request (e.g., missing message IDs or invalid JSON)
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: "string"
+                    description: Invalid request (e.g., missing message IDs or invalid JSON)
+              example:
+                message: Invalid request (e.g., missing message IDs or invalid JSON)
+
+        "403":
+          description: User does not belong to the conversation
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: "string"
+                    description: The user doesn't belong to this conversation.
+              example:
+                message: User doesn't belong to the conversation
+
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
@@ -590,12 +678,12 @@ paths:
             schema:
               type: object
               required:
-                - conversationId
+                - conversation_id
               properties:
-                conversationId:
+                conversation_id:
                   type: integer
             example:
-              conversationId: 38
+              conversation_id: 38
 
       responses:
         "200":
@@ -683,7 +771,7 @@ paths:
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
-  /messages/{id}/comment/{commentId}:
+  /messages/{id}/comment/{comment_id}:
     delete:
       tags:
         - Messages
@@ -697,7 +785,7 @@ paths:
           description: The message id
           schema:
             type: integer
-        - name: commentId
+        - name: comment_id
           in: path
           required: true
           description: The comment id
@@ -982,7 +1070,7 @@ paths:
                     example: Group photo updated successfully
                   photo_path:
                     type: string
-                    example: /tmp/storage/groups/1.png
+                    example: groups/1.png
         "400":
           description: Invalid input image
           content:
@@ -1027,23 +1115,23 @@ paths:
                       properties:
                         username:
                           $ref: "#/components/schemas/Username"
-                        userId:
+                        user_id:
                           type: integer
                         photo_path:
                           type: string
                           nullable: true
               example:
                 users:
-                  - userId: 1
+                  - user_id: 1
                     username: alemilos
-                    photo_path: "/tmp/storage/groups/7/photo.png"
-                  - userId: 2
+                    photo_path: "groups/7/photo.png"
+                  - user_id: 2
                     username: mistermaster
                     photo_path: null
-                  - userId: 3
+                  - user_id: 3
                     username: johndoe
-                    photo_path: "/tmp/storage/groups/7/photo.png"
-                  - userId: 4
+                    photo_path: "groups/7/photo.png"
+                  - user_id: 4
                     username: viral_man
                     photo_path: null
         "401":
@@ -1086,14 +1174,14 @@ paths:
                   message:
                     type: string
                     example: "Group created successfully."
-                  groupId:
+                  group_id:
                     type: integer
-                  membersAdded:
+                  members_added:
                     type: array
                     items:
                       type: integer
                     example: [2, 3, 5]
-                  membersIgnored:
+                  members_ignored:
                     type: array
                     items:
                       type: integer

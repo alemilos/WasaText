@@ -38,13 +38,35 @@ import (
 
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
-	// USERS
+	// Users
 	CreateUser(username string, photoPath *string) (*User, error)
 	SetUsername(userID int64, newName string) error
 	SetProfilePhoto(userID int64, photoPath string) error
 	GetUserById(id int64) (*User, error)
 	GetUserByUsername(username string) (*User, error)
 	GetUsers() ([]User, error)
+
+	// Conversations
+	CreatePrivateConversation(user1ID, user2ID int64) (*Conversation, error)
+	GetPrivateConversation(user1ID, user2ID int64) (*Conversation, error)
+	GetConversationByID(id int64) (*Conversation, error)
+	GetConversationsByUserID(userID int64) ([]Conversation, error)
+	CreateGroupConversation(name string, creatorID int64, memberIDs []int64) (*Conversation, error)
+
+	// Conversation Members
+	IsMember(conversationID, userID int64) error
+	GetMembersByConversation(conversationID int64) ([]int64, error)
+
+	// Messages
+	CreateMessage(conversationID, authorID int64, msgType string, content string, isForwarded bool) (*Message, error)
+	GetMessageByID(id int64) (*Message, error)
+	GetMessagesByConversation(conversationID int64) ([]Message, error)
+	GetLastMessageByConversation(conversationID int64) (*Message, error)
+	UpdateMessageContent(messageID int64, content string) error
+
+	// Message Read
+	CreateMessageRead(messageID, memberID int64) error
+	GetReadMembersByMessage(messageID int64) ([]int64, error)
 
 	Ping() error
 }

@@ -15,6 +15,49 @@ func InitializeSchema(db *sql.DB) error {
 			photo_path TEXT,
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 		);`,
+		`CREATE TABLE IF NOT EXISTS conversations (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			type TEXT NOT NULL CHECK(type IN ('private','group')),
+			photo_path TEXT,	
+			name TEXT, 
+			created_by INTEGER NOT NULL,
+			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+			FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE,
+			-- constraints for type 'group'
+			CHECK (type != 'group' OR name IS NOT NULL)
+		);`,
+		`CREATE TABLE IF NOT EXISTS conversation_members (
+			conversation_id INTEGER NOT NULL,
+    		user_id INTEGER NOT NULL,
+    		role TEXT, -- "admin" or "member", valid only for group conversations
+    		joined_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    		PRIMARY KEY (conversation_id, user_id),
+    		FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE,
+    		FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE	
+		);`,
+		`CREATE TABLE IF NOT EXISTS messages (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+    		type TEXT NOT NULL CHECK(type IN ('text', 'image')),
+    		is_forwarded INTEGER NOT NULL DEFAULT 0 CHECK(is_forwarded IN (0,1)),
+    		conversation_id INTEGER NOT NULL,
+    		author_id INTEGER NOT NULL,
+    		content TEXT NOT NULL,
+    		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    		FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE,
+    		FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE CASCADE
+		);`,
+		`CREATE TABLE IF NOT EXISTS message_read(
+			message_id INTEGER NOT NULL,
+			member_id INTEGER NOT NULL,
+			read_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+			PRIMARY KEY (message_id, member_id),
+			FOREIGN KEY (message_id) REFERENCES messages(id) ON DELETE CASCADE,
+			FOREIGN KEY (member_id) REFERENCES users(id) ON DELETE CASCADE
+		);`,
 		// Add here other table cretions
 	}
 
