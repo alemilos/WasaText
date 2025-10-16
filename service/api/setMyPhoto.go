@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path"
 	"path/filepath"
 
 	"git.sapienzaapps.it/fantasticcoffee/fantastic-coffee-decaffeinated/service/api/constants"
@@ -83,7 +84,7 @@ func (rt *_router) setMyPhoto(w http.ResponseWriter, r *http.Request, ps httprou
 
 	userID := ctx.User.ID
 	filePath := filepath.Join(uploadDir, fmt.Sprintf("%d%s", userID, ext))
-	relPath := fmt.Sprintf("%s%d%s", constants.PROFILE_PHOTO_PATH, userID, ext)
+	relPath := path.Join(constants.PROFILE_PHOTO_PATH, fmt.Sprintf("%d%s", userID, ext))
 
 	out, err := os.Create(filePath)
 	if err != nil {
