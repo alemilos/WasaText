@@ -7,6 +7,16 @@ info:
     Users can create groups, private chats, send text or image messages, 
     reply, forward or react them.
   version: 1.0.0
+servers:
+  - url: http://localhost:3000/v1
+    description: Production server
+tags:
+  - name: Auth
+  - name: Users
+  - name: Conversations
+  - name: Messages
+  - name: Groups
+    description: Endpoints related to authentication and user creation
 
 components:
   securitySchemes:
@@ -30,6 +40,7 @@ components:
                 example: "Unauthorized"
   schemas:
     Username:
+      description: The unique username chosen by the user.
       type: string
       example: alemilos
       pattern: "^[a-zA-Z0-9_]*[a-zA-Z][a-zA-Z0-9_]*$"
@@ -67,6 +78,7 @@ paths:
         content:
           application/json:
             schema:
+              description: The username chosen by the user
               type: object
               properties:
                 username:
@@ -78,40 +90,44 @@ paths:
           content:
             application/json:
               schema:
+                description: The user data of the logged in user
                 type: object
                 properties:
                   id:
                     type: integer
                     example: 5
+                    description: the user id
                   username:
                     $ref: "#/components/schemas/Username"
-                  photo_path:
+                  photoPath:
                     type: string
                     example: profiles/10.png
+                    description: the profile photo path
               example:
                 id: 10
                 username: "alemilos"
-                photo_path: "profiles/10.png"
+                photoPath: "profiles/10.png"
         "201":
           description: New user created and logged in successfully
           content:
             application/json:
               schema:
+                description: The user data of the registered user
                 type: object
                 properties:
                   id:
                     type: integer
                     example: 5
+                    description: the user id
                   username:
                     $ref: "#/components/schemas/Username"
-                  photo_path:
+                  photoPath:
                     type: string
-                    nullable: true
-                    example: null
+                    description: the profile photo path
               example:
                 id: 6
                 username: "newuser"
-                photo_path: null
+                photoPath: null
   /me/username:
     put:
       tags:
@@ -126,6 +142,7 @@ paths:
         content:
           application/json:
             schema:
+              description: The new username chosen by the user
               type: object
               properties:
                 username:
@@ -137,31 +154,37 @@ paths:
           content:
             application/json:
               schema:
+                description: A descriptive message of success
                 type: object
                 properties:
                   message:
                     type: string
                     example: "Username successfully updated"
+                    description: The success message
         "400":
           description: Invalid username
           content:
             application/json:
               schema:
+                description: A descriptive message of invalid username
                 type: object
                 properties:
                   message:
                     type: string
                     example: "The username must be between 3 and 16 characters and contain only alphanumeric characters or underscores"
+                    description: The failure message
         "409":
           description: Username already exists
           content:
             application/json:
               schema:
+                description: A descriptive message for already taken username
                 type: object
                 properties:
                   message:
                     type: string
                     example: This username is already taken
+                    description: The failure message
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
@@ -189,19 +212,23 @@ paths:
           content:
             application/json:
               schema:
+                description: A descriptive message of success and the new image url
                 type: object
                 properties:
                   message:
                     type: string
                     example: "Profile photo updated"
-                  photo_path:
+                    description: The success message
+                  photoPath:
                     type: string
                     example: profiles/1.png
+                    description: The newly profile photo path
         "400":
           description: Invalid input image
           content:
             application/json:
               schema:
+                description: A descriptive message of different failures
                 type: "object"
                 properties:
                   message:
@@ -233,79 +260,94 @@ paths:
         content:
           application/json:
             schema:
+              description: The recipient id to start the conversation with
               oneOf:
                 - type: object
                   required:
-                    - recipient_id
+                    - recipientId
                   properties:
-                    recipient_id:
+                    recipientId:
                       type: integer
                       description: The ID of the recipient user.
               example:
-                recipient_id: 23
+                recipientId: 23
       responses:
         "201":
           description: Conversation created successfully
           content:
             application/json:
               schema:
+                description: An object for the newly created conversation
                 type: object
                 properties:
-                  conversation_id:
+                  conversationId:
                     type: integer
+                    description: The conversation id
                   type:
                     type: string
-                  created_by:
+                    description: The conversation type 'private' | 'group'
+                  createdBy:
                     type: integer
-                  created_at:
+                    description: The user id of the conversation creator
+                  createdAt:
                     type: string
                     format: date-time
+                    description: The date of conversation creation
               example:
-                conversation_id: 18
+                conversationId: 18
                 type: private
-                created_by: 31
-                created_at: "2025-10-12T15:42:00Z"
+                createdBy: 31
+                createdAt: "2025-10-12T15:42:00Z"
         "200":
           description: Existing conversation returned
           content:
             application/json:
               schema:
+                description: An object fot the existing conversation
                 type: object
                 properties:
-                  conversation_id:
+                  conversationId:
                     type: integer
+                    description: The conversation id
                   type:
                     type: string
-                  created_by:
+                    description: The conversation type 'private' | 'group'
+                  createdBy:
                     type: integer
-                  created_at:
+                    description: The user id of the conversation creator
+                  createdAt:
                     type: string
                     format: date-time
+                    description: The date of conversation creation
               example:
-                conversation_id: 7
+                conversationId: 7
                 type: private
-                created_by: 31
-                created_at: "2025-09-25T09:20:00Z"
+                createdBy: 31
+                createdAt: "2025-09-25T09:20:00Z"
         "400":
           description: Invalid request body
           content:
             application/json:
               schema:
+                description: A descriptive message of failure
                 type: object
                 properties:
                   message:
                     type: string
                     example: "Missing recipient id"
+                    description: The message of failure
         "404":
           description: Recipient not found
           content:
             application/json:
               schema:
+                description: A descriptive message of failure
                 type: object
                 properties:
                   message:
                     type: string
                     example: "User not found"
+                    description: The message of failure
         "401":
           $ref: "#/components/responses/UnauthorizedError"
     get:
@@ -322,6 +364,7 @@ paths:
           content:
             application/json:
               schema:
+                description: An object containing the array of conversations for the user
                 type: object
                 properties:
                   conversations:
@@ -329,67 +372,78 @@ paths:
                     items:
                       type: object
                       properties:
-                        conversation_id:
+                        conversationId:
                           type: integer
+                          description: The conversation id
                         type:
                           type: string
                           enum: [private, group]
+                          description: The conversation type 'private' | 'group'
                         name:
                           type: string
-                        photo_path:
+                          description: The conversation name (if the conversation is a group)
+                        photoPath:
                           type: string
-                          nullable: true
-                        created_by:
+                          description: The conversation photo path (if the conversation is a group)
+                        createdBy:
                           type: integer
-                        created_at:
+                          description: The conversation creator's user id
+                        createdAt:
                           type: string
                           format: date-time
-                        last_message:
+                          description: The conversation datetime of creation
+                        lastMessage:
                           type: object
-                          nullable: true
+                          description: The last message sent in the conversation
                           properties:
                             id:
                               type: integer
+                              description: The message id
                             type:
                               type: string
                               enum: [text, image]
-                            is_forwarded:
+                              description: The message type 'text' | 'image'
+                            isForwarded:
                               type: boolean
-                            author_id:
+                              description: Whether the message was forwarded
+                            authorId:
                               type: integer
+                              description: The user id that created the message
                             content:
                               type: string
-                            created_at:
+                              description: The message text content (for type text) or photo path (for type image)
+                            createdAt:
                               type: string
                               format: date-time
+                              description: The message datetime of creation
               example:
                 conversations:
-                  - conversation_id: 7
+                  - conversationId: 7
                     type: group
                     name: Partite Calcio
-                    photo_path: "groups/7/photo.png"
-                    created_by: 31
-                    created_at: "2025-09-29T14:48:00Z"
-                    last_message:
+                    photoPath: "groups/7/photo.png"
+                    createdBy: 31
+                    createdAt: "2025-09-29T14:48:00Z"
+                    lastMessage:
                       id: 239
                       type: text
-                      is_forwarded: false
-                      author_id: 20
+                      isForwarded: false
+                      authorId: 20
                       content: "Va bene ci sono per stasera, ci vediamo!"
-                      created_at: "2025-09-28T16:30:00Z"
-                  - conversation_id: 12
+                      createdAt: "2025-09-28T16:30:00Z"
+                  - conversationId: 12
                     type: private
                     name: "Edoardo"
-                    photo_path: null
-                    created_by: 31
-                    created_at: "2025-09-25T09:20:00Z"
-                    last_message:
+                    photoPath: null
+                    createdBy: 31
+                    createdAt: "2025-09-25T09:20:00Z"
+                    lastMessage:
                       id: 312
                       type: text
-                      is_forwarded: false
-                      author_id: 45
+                      isForwarded: false
+                      authorId: 45
                       content: "Ci sentiamo più tardi!"
-                      created_at: "2025-09-28T18:10:00Z"
+                      createdAt: "2025-09-28T18:10:00Z"
 
         "401":
           $ref: "#/components/responses/UnauthorizedError"
@@ -417,66 +471,103 @@ paths:
           content:
             application/json:
               schema:
+                description: An object containing an array of messages for the conversation
                 type: object
                 properties:
                   messages:
+                    description: Array of messages for the conversation
                     type: array
                     items:
                       type: object
                       properties:
-                        message_id:
+                        messageId:
                           type: integer
+                          description: The message id
                         type:
                           type: string
                           enum: [text, image]
-                        is_forwarded:
+                          description: The message type 'text' | 'image'
+                        isForwarded:
                           type: boolean
+                          description: Wheather the message was forwarded
                         content:
                           type: string
-                        author_id:
+                          description: The message text content (for type text) or photo path (for type image)
+                        authorId:
                           type: integer
-                        created_at:
+                          description: The message author id
+                        createdAt:
                           type: string
                           format: date-time
-                        message_status:
+                          description: The message datetime of creation
+                        messageStatus:
                           type: object
+                          description: The message status 'received' | 'read' with the id of the members who read it
                           properties:
                             status:
                               type: string
                               enum: [received, read]
+                              description: The status of the message, 'read' if all the members read the message, 'received' otherwise
                             members:
+                              description: The member ids that read the message
                               type: array
                               items:
                                 type: integer
+                        comments:
+                          type: array
+                          description: List of emoji reactions to this message
+                          items:
+                            type: object
+                            properties:
+                              authorId:
+                                type: integer
+                                description: The user id of the user that reacted
+                              emoji:
+                                type: string
+                                description: The emoji reaction (Unicode)
+                              createdAt:
+                                type: string
+                                format: date-time
+                                description: The comment datetime of creation
+
               example:
                 messages:
-                  - message_id: 65
+                  - messageId: 65
                     type: image
-                    is_forwarded: true
+                    isForwarded: true
                     content: "groups/7/images/photo123.jpeg"
-                    author_id: 3
-                    created_at: "2025-09-29T14:48:00Z"
-                    message_status:
+                    authorId: 3
+                    createdAt: "2025-09-29T14:48:00Z"
+                    messageStatus:
                       status: read
                       members: [1, 2, 3]
-                  - message_id: 66
+                    comments:
+                      - authorId: 1
+                        emoji: "🔥"
+                        createdAt: "2025-09-29T14:48:32Z"
+                      - authorId: 2
+                        emoji: "😂"
+                        createdAt: "2025-09-29T14:49:00Z"
+                  - messageId: 66
                     type: text
-                    is_forwarded: false
+                    isForwarded: false
                     content: "AHHAAHH che ridere!"
-                    author_id: 1
+                    authorId: 1
                     created_at: "2025-09-29T15:00:00Z"
-                    message_status:
+                    messageStatus:
                       status: received
                       members: [1, 3]
-                  - message_id: 67
+                    comments: []
+                  - messageId: 67
                     type: text
-                    is_forwarded: false
+                    isForwarded: false
                     content: "No vabbe troppo divertente"
-                    author_id: 2
-                    created_at: "2025-09-29T15:05:00Z"
-                    message_status:
+                    authorId: 2
+                    createdAt: "2025-09-29T15:05:00Z"
+                    messageStatus:
                       status: received
                       members: [3]
+                    comments: []
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
@@ -485,6 +576,7 @@ paths:
           content:
             application/json:
               schema:
+                description: A descriptive messafe of failure
                 type: "object"
                 properties:
                   message:
@@ -512,6 +604,7 @@ paths:
         content:
           application/json:
             schema:
+              description: Properties to send a new message in the conversation
               type: object
               required:
                 - type
@@ -520,6 +613,7 @@ paths:
                 type:
                   type: string
                   enum: [text]
+                  description: the message type 'text'
                 content:
                   type: string
                   description: Text content of the message
@@ -528,6 +622,7 @@ paths:
               content: "Hello, how are you?"
           multipart/form-data:
             schema:
+              description: Properties to send a new message in the conversation
               type: object
               required:
                 - type
@@ -536,6 +631,7 @@ paths:
                 type:
                   type: string
                   enum: [image]
+                  description: the message type 'image'
                 file:
                   type: string
                   format: binary
@@ -551,23 +647,29 @@ paths:
           content:
             application/json:
               schema:
+                description: An object representing the newly created message
                 type: object
                 properties:
-                  message_id:
+                  messageId:
                     type: integer
+                    description: The message id
                   type:
                     type: string
                     enum: [text, image]
+                    description: The message type 'text' | 'image'
                   content:
                     type: string
-                  created_at:
+                    description: The message content (text if type is 'text', photo path if type is 'image')
+                  createdAt:
                     type: string
                     format: date-time
+                    description: The datetime of message creation
         "400":
           description: Invalid input image
           content:
             application/json:
               schema:
+                description: A descriptive message of different failures
                 type: "object"
                 properties:
                   message:
@@ -584,6 +686,7 @@ paths:
           content:
             application/json:
               schema:
+                description: A descriptive message of failure
                 type: "object"
                 properties:
                   message:
@@ -615,11 +718,13 @@ paths:
         content:
           application/json:
             schema:
+              description: An object with an array of messages id that will be marked as read
               type: object
               required:
                 - messages
               properties:
                 messages:
+                  description: Array of message ids
                   type: array
                   items:
                     type: integer
@@ -634,6 +739,7 @@ paths:
           content:
             application/json:
               schema:
+                description: A descritive message of failure
                 type: "object"
                 properties:
                   message:
@@ -647,6 +753,7 @@ paths:
           content:
             application/json:
               schema:
+                description: A descritive message of failure
                 type: "object"
                 properties:
                   message:
@@ -677,14 +784,16 @@ paths:
         content:
           application/json:
             schema:
+              description: The conversation id to forward the message to
               type: object
               required:
-                - conversation_id
+                - conversationId
               properties:
-                conversation_id:
+                conversationId:
                   type: integer
+                  description: the conversation id
             example:
-              conversation_id: 38
+              conversationId: 38
 
       responses:
         "200":
@@ -692,10 +801,12 @@ paths:
           content:
             application/json:
               schema:
+                description: A descriptive message of success
                 type: object
                 properties:
                   message:
                     type: string
+                    description: the success message
               example:
                 message: Message forwarded successfully
         "404":
@@ -703,6 +814,7 @@ paths:
           content:
             application/json:
               schema:
+                description: A descritive message of failure
                 type: "object"
                 properties:
                   message:
@@ -715,30 +827,33 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
 
   /messages/{id}/comment:
-    post:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: The message id
+        schema:
+          type: integer
+    put:
       tags:
         - Messages
       summary: React to a message
       description: React to a message with an emoji.
       operationId: commentMessage
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: The message id
-          schema:
-            type: integer
       requestBody:
         description: React to a message with an emoji unicode
         content:
           application/json:
             schema:
+              description: An emoji that matches the pattern
               type: object
               properties:
                 emoji:
+                  description: the emoji string (simplified, check source code for more informations validation.emoji.go)
                   type: string
-                  example: U+2764
-                  pattern: "(\\\\u00a9|\\\\u00ae|[\\\\u2000-\\\\u3300]|\\\\ud83c[\\\\ud000-\\\\udfff]|\\\\ud83d[\\\\ud000-\\\\udfff]|\\\\ud83e[\\\\ud000-\\\\udfff])"
+                  example: ❤️
+                  pattern: '^[\u2000-\u2BFF\uE000-\uFFFF]+$'
+
         required: true
       responses:
         "200":
@@ -746,10 +861,12 @@ paths:
           content:
             application/json:
               schema:
+                description: A descriptive message of success
                 type: object
                 properties:
                   message:
                     type: string
+                    description: the message of success
                 example:
                   message: Reacted to message successfully
         "400":
@@ -757,6 +874,7 @@ paths:
           content:
             application/json:
               schema:
+                description: A descriptive message of different failures
                 type: "object"
                 properties:
                   message:
@@ -772,36 +890,24 @@ paths:
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
-  /messages/{id}/comment/{comment_id}:
     delete:
       tags:
         - Messages
       summary: Remove message reaction
       description: Delete the emoji reaction from
       operationId: uncommentMessage
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: The message id
-          schema:
-            type: integer
-        - name: comment_id
-          in: path
-          required: true
-          description: The comment id
-          schema:
-            type: integer
       responses:
         "200":
           description: Message reaction deleted
           content:
             application/json:
               schema:
+                description: A descriptive message of success
                 type: object
                 properties:
                   message:
                     type: string
+                    description: the message of success
               example:
                 message: Message reaction deleted successfully
         "404":
@@ -809,6 +915,7 @@ paths:
           content:
             application/json:
               schema:
+                description: A descriptive message of failure
                 type: "object"
                 properties:
                   message:
@@ -840,10 +947,12 @@ paths:
           content:
             application/json:
               schema:
+                description: A descriptive message of success
                 type: object
                 properties:
                   message:
                     type: string
+                    description: the message of success
                 example:
                   message: Message deleted successfully
         "404":
@@ -851,10 +960,12 @@ paths:
           content:
             application/json:
               schema:
+                description: A descriptive message of failure
                 type: object
                 properties:
                   message:
                     type: string
+                    description: the message of failure
                 example:
                   message: Message not found
         "403":
@@ -862,10 +973,12 @@ paths:
           content:
             application/json:
               schema:
+                description: A descriptive message of failure
                 type: object
                 properties:
                   message:
                     type: string
+                    description: the message of failure
                 example:
                   message: Cannot delete messages older than 30 minutes
         "401":
@@ -890,12 +1003,14 @@ paths:
         content:
           application/json:
             schema:
+              description: The username of the member to add
               type: object
               required:
-                - username
+                - userId
               properties:
-                username:
-                  $ref: "#/components/schemas/Username"
+                userId:
+                  type: integer
+                  description: user id
       responses:
         "200":
           description: Member added to the group successfully.
@@ -903,6 +1018,7 @@ paths:
             application/json:
               schema:
                 type: object
+                description: A descriptive message of success
                 example:
                   message: Member added to the group successfully
 
@@ -911,6 +1027,7 @@ paths:
           content:
             application/json:
               schema:
+                description: A descriptive message of failure
                 type: object
                 properties:
                   message:
@@ -923,6 +1040,7 @@ paths:
           content:
             application/json:
               schema:
+                description: A descriptive message of different failures
                 type: object
                 properties:
                   message:
@@ -949,6 +1067,7 @@ paths:
             application/json:
               schema:
                 type: object
+                description: A descriptive message of success
                 example:
                   message: Left the group successfully
         "400":
@@ -956,6 +1075,7 @@ paths:
           content:
             application/json:
               schema:
+                description: A descriptive message of failure
                 type: object
                 properties:
                   message:
@@ -968,6 +1088,7 @@ paths:
           content:
             application/json:
               schema:
+                description: A descriptive message of failure
                 type: object
                 properties:
                   message:
@@ -997,12 +1118,14 @@ paths:
         content:
           application/json:
             schema:
+              description: Update the group name
               type: object
               required:
                 - name
               properties:
                 name:
                   type: string
+                  description: the new group name
             example:
               name: I ragazzi del calcetto
       responses:
@@ -1011,6 +1134,7 @@ paths:
           content:
             application/json:
               schema:
+                description: A descriptive message of success
                 type: object
                 example:
                   message: Group name changed successfully.
@@ -1020,6 +1144,7 @@ paths:
           content:
             application/json:
               schema:
+                description: A descriptive message of failure
                 type: object
                 properties:
                   message:
@@ -1036,6 +1161,7 @@ paths:
           content:
             application/json:
               schema:
+                description: A descriptive message of failure
                 type: object
                 properties:
                   message:
@@ -1075,19 +1201,23 @@ paths:
           content:
             application/json:
               schema:
+                description: A descriptive message of success
                 type: object
                 properties:
                   message:
                     type: string
                     example: Group photo updated successfully
-                  photo_path:
+                    description: A success message
+                  photoPath:
                     type: string
                     example: groups/1.png
+                    description: the path of the group image
         "400":
           description: Invalid input image
           content:
             application/json:
               schema:
+                description: A descriptive message of failure
                 type: "object"
                 properties:
                   message:
@@ -1118,34 +1248,39 @@ paths:
           content:
             application/json:
               schema:
+                description: An object containing an array of users objects
                 type: object
                 properties:
                   users:
+                    minItems: 0
+                    maxItems: 1000
+                    description: Array of users
                     type: array
                     items:
                       type: object
                       properties:
                         username:
                           $ref: "#/components/schemas/Username"
-                        user_id:
+                        userId:
                           type: integer
-                        photo_path:
+                          description: A user id
+                        photoPath:
                           type: string
-                          nullable: true
+                          description: path of the group image
               example:
                 users:
-                  - user_id: 1
+                  - userId: 1
                     username: alemilos
-                    photo_path: "groups/7/photo.png"
-                  - user_id: 2
+                    photoPath: "groups/7/photo.png"
+                  - userId: 2
                     username: mistermaster
-                    photo_path: null
-                  - user_id: 3
+                    photoPath: null
+                  - userId: 3
                     username: johndoe
-                    photo_path: "groups/7/photo.png"
-                  - user_id: 4
+                    photoPath: "groups/7/photo.png"
+                  - userId: 4
                     username: viral_man
-                    photo_path: null
+                    photoPath: null
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
@@ -1161,15 +1296,19 @@ paths:
         content:
           application/json:
             schema:
+              description: Fields to create a group with
               type: object
               required:
                 - name
               properties:
                 name:
                   type: string
+                  minLength: 0
+                  maxLength: 30
+                  description: The name of the group
                 members:
                   type: array
-                  description: List of userIds to add to the group
+                  description: List of user ids to add to the group
                   items:
                     type: integer
             example:
@@ -1181,19 +1320,28 @@ paths:
           content:
             application/json:
               schema:
+                description: A descriptive message of success and fields of the newly created group
                 type: object
                 properties:
                   message:
                     type: string
                     example: "Group created successfully."
-                  group_id:
+                    description: the response message
+                  groupId:
                     type: integer
-                  members_added:
+                    description: The group id
+                  membersAdded:
                     type: array
+                    description: Array of user ids added to the group
+                    minItems: 0
+                    maxItems: 1000
                     items:
                       type: integer
                     example: [2, 3, 5]
-                  members_ignored:
+                  membersIgnored:
+                    minItems: 0
+                    maxItems: 1000
+                    description: Array of user ids not added to the group for any problem
                     type: array
                     items:
                       type: integer
