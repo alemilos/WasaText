@@ -66,5 +66,5 @@ func (rt *_router) commentMessage(w http.ResponseWriter, r *http.Request, ps htt
 
 	// Response message
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"message": "Reacted to message successfully"})
+	_ = json.NewEncoder(w).Encode(map[string]string{"message": "Reacted to message successfully"})
 }

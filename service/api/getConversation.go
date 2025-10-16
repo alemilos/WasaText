@@ -60,7 +60,7 @@ func (rt *_router) databaseToApiConversationMessages(
 	totalMembers int,
 ) ([]ConversationMessage, error) {
 
-	var apiMessages []ConversationMessage
+	apiMessages := make([]ConversationMessage, 0, len(dbMessages))
 
 	for _, msg := range dbMessages {
 		readMembers, err := rt.db.GetReadMembersByMessage(msg.ID)
