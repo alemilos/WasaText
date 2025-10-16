@@ -70,6 +70,11 @@ func (rt *_router) forwardMessage(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
+	// Sender will mark as read its own message
+	if err := rt.db.CreateMessageRead(newMsg.ID, ctx.User.ID); err != nil {
+		ctx.Logger.WithError(err).Error("failed to mark message as read for sender")
+	}
+
 	// --- 8. Return the new message as JSON ---
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
