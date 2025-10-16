@@ -69,6 +69,12 @@ type AppDatabase interface {
 	CreateMessageRead(messageID, memberID int64) error
 	GetReadMembersByMessage(messageID int64) ([]int64, error)
 
+	// Comments
+	AddOrUpdateComment(messageID, authorID int64, emoji string) error
+	GetCommentByUser(messageID, authorID int64) (*Comment, error)
+	GetCommentsByMessage(messageID int64) ([]Comment, error)
+	DeleteComment(messageID, authorID int64) error
+
 	Ping() error
 }
 

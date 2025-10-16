@@ -58,6 +58,16 @@ func InitializeSchema(db *sql.DB) error {
 			FOREIGN KEY (message_id) REFERENCES messages(id) ON DELETE CASCADE,
 			FOREIGN KEY (member_id) REFERENCES users(id) ON DELETE CASCADE
 		);`,
+		`CREATE TABLE IF NOT EXISTS comments (
+			message_id INTEGER NOT NULL,
+			author_id INTEGER NOT NULL,
+			emoji TEXT NOT NULL,
+			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+			PRIMARY KEY (message_id, author_id),
+			FOREIGN KEY (message_id) REFERENCES messages(id) ON DELETE CASCADE,
+			FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE CASCADE
+		);`,
 		// Add here other table cretions
 	}
 
