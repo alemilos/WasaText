@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"git.sapienzaapps.it/fantasticcoffee/fantastic-coffee-decaffeinated/service/validation"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -28,6 +29,12 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 
 	if req.Username == "" {
 		http.Error(w, ErrorMessage("Username is required"), http.StatusBadRequest)
+		return
+	}
+
+	// === Validate the username ===
+	if err := validation.ValidateUsername(req.Username); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
