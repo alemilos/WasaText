@@ -33,12 +33,123 @@ components:
       content:
         application/json:
           schema:
+            description: Unauthorized Error. Each request that requires authorization and fails to validate the user, will throw this error.
             type: object
             properties:
               message:
+                description: The error message
                 type: string
                 example: "Unauthorized"
   schemas:
+    Message:
+      description: A message object belonging to a conversation
+      type: object
+      properties:
+        messageId:
+          type: integer
+          description: The message id
+        type:
+          type: string
+          enum: [text, image]
+          description: The message type 'text' | 'image'
+        isForwarded:
+          type: boolean
+          description: Whether the message was forwarded
+        content:
+          type: string
+          description: The message text content (for type text) or photo path (for type image)
+        authorId:
+          type: integer
+          description: The message author id
+        createdAt:
+          type: string
+          format: date-time
+          description: The message datetime of creation
+        messageStatus:
+          type: object
+          description: The message status 'received' | 'read' with the id of the members who read it
+          properties:
+            status:
+              type: string
+              enum: [received, read]
+              description: The status of the message
+            members:
+              minItems: 0
+              maxItems: 1000
+              type: array
+              description: Member ids that read the message
+              items:
+                type: integer
+        comments:
+          minItems: 0
+          maxItems: 1000
+          type: array
+          description: List of emoji reactions to this message
+          items:
+            type: object
+            properties:
+              emoji:
+                type: string
+                description: The emoji reaction
+              userId:
+                type: integer
+                description: The user who reacted
+              createdAt:
+                type: string
+                format: date-time
+                description: The date of comment creation
+
+    Conversation:
+      description: A conversation object, either private or a group.
+      type: object
+      properties:
+        conversationId:
+          type: integer
+          description: The conversation id
+        type:
+          type: string
+          enum: [private, group]
+          description: The conversation type 'private' | 'group'
+        name:
+          type: string
+          description: The conversation name (only for groups)
+        photoPath:
+          type: string
+          description: The conversation photo path (only for groups)
+        createdBy:
+          type: integer
+          description: The user id of the conversation creator
+        createdAt:
+          type: string
+          format: date-time
+          description: The date of conversation creation
+        members:
+          minItems: 0
+          maxItems: 1000
+          type: array
+          description: List of user ids that are members of the conversation
+          items:
+            type: integer
+        messages:
+          minItems: 0
+          maxItems: 1000
+          type: array
+          description: Messages belonging to the conversation
+          items:
+            $ref: "#/components/schemas/Message"
+      required:
+        - conversationId
+        - type
+        - createdBy
+        - createdAt
+      example:
+        conversationId: 18
+        type: private
+        createdBy: 31
+        createdAt: "2025-10-12T15:42:00Z"
+        members: [1, 2, 3]
+        messages: []
+
     Username:
       description: The unique username chosen by the user.
       type: string
@@ -47,16 +158,35 @@ components:
       minLength: 3
       maxLength: 16
     ImageUpload:
+      description: Image upload input validation. The image size can be at most 2MB and the allowed types are jpeg, png and webp.
       type: object
       properties:
         file:
           type: string
           format: binary
+          minLength: 0
+          maxLength: 2000000
           description: >
             Image file to upload. Allowed types: jpeg, png, webp.
             Max size: 2MB.
       required:
         - file
+    ErrorMessage:
+      description: An error message thrown on the response
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message
+          example: "User not found"
+    SuccessMessage:
+      description: A success message provided in the response
+      type: object
+      properties:
+        message:
+          type: string
+          description: Success message
+          example: "Operation completed successfully"
 
 security:
   - BearerAuth: []
@@ -121,13 +251,9 @@ paths:
                     description: the user id
                   username:
                     $ref: "#/components/schemas/Username"
-                  photoPath:
-                    type: string
-                    description: the profile photo path
               example:
                 id: 6
                 username: "newuser"
-                photoPath: null
   /me/username:
     put:
       tags:
@@ -154,13 +280,10 @@ paths:
           content:
             application/json:
               schema:
-                description: A descriptive message of success
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Username successfully updated"
-                    description: The success message
+                $ref: "#/components/schemas/SuccessMessage"
+              example:
+                message: "Username successfully updated"
+
         "400":
           description: Invalid username
           content:
@@ -223,26 +346,17 @@ paths:
                     type: string
                     example: profiles/1.png
                     description: The newly profile photo path
+              example:
+                message: "Profile photo updated"
+                photoPath: "profiles/1.png"
         "400":
           description: Invalid input image
           content:
             application/json:
               schema:
-                description: A descriptive message of different failures
-                type: "object"
-                properties:
-                  message:
-                    type: "string"
-                    description: >
-                      error:
-                      * `First Error`  - No file uploaded.
-                      * `Second Error` - Wrong file format. Only jpeg, png and webp are allowed.
-                      * `Third Error`  - File too big. The image can't be bigger than 2Mb.
-                    enum:
-                      - no_file_uploaded
-                      - wrong_file_format
-                      - file_too_big
-                    default: "Wrong file format. Only jpeg, png and webp are allowed."
+                $ref: "#/components/schemas/ErrorMessage"
+              example:
+                message: "Wrong File Format"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
@@ -277,22 +391,7 @@ paths:
           content:
             application/json:
               schema:
-                description: An object for the newly created conversation
-                type: object
-                properties:
-                  conversationId:
-                    type: integer
-                    description: The conversation id
-                  type:
-                    type: string
-                    description: The conversation type 'private' | 'group'
-                  createdBy:
-                    type: integer
-                    description: The user id of the conversation creator
-                  createdAt:
-                    type: string
-                    format: date-time
-                    description: The date of conversation creation
+                $ref: "#/components/schemas/Conversation"
               example:
                 conversationId: 18
                 type: private
@@ -303,22 +402,7 @@ paths:
           content:
             application/json:
               schema:
-                description: An object fot the existing conversation
-                type: object
-                properties:
-                  conversationId:
-                    type: integer
-                    description: The conversation id
-                  type:
-                    type: string
-                    description: The conversation type 'private' | 'group'
-                  createdBy:
-                    type: integer
-                    description: The user id of the conversation creator
-                  createdAt:
-                    type: string
-                    format: date-time
-                    description: The date of conversation creation
+                $ref: "#/components/schemas/Conversation"
               example:
                 conversationId: 7
                 type: private
@@ -368,7 +452,10 @@ paths:
                 type: object
                 properties:
                   conversations:
+                    description: The conversations array
                     type: array
+                    minItems: 0
+                    maxItems: 1000
                     items:
                       type: object
                       properties:
@@ -421,7 +508,7 @@ paths:
                   - conversationId: 7
                     type: group
                     name: Partite Calcio
-                    photoPath: "groups/7/photo.png"
+                    photoPath: "groups/7.png"
                     createdBy: 31
                     createdAt: "2025-09-29T14:48:00Z"
                     lastMessage:
@@ -434,7 +521,7 @@ paths:
                   - conversationId: 12
                     type: private
                     name: "Edoardo"
-                    photoPath: null
+                    photoPath: "profiles/4.webp"
                     createdBy: 31
                     createdAt: "2025-09-25T09:20:00Z"
                     lastMessage:
@@ -471,66 +558,12 @@ paths:
           content:
             application/json:
               schema:
-                description: An object containing an array of messages for the conversation
-                type: object
-                properties:
-                  messages:
-                    description: Array of messages for the conversation
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        messageId:
-                          type: integer
-                          description: The message id
-                        type:
-                          type: string
-                          enum: [text, image]
-                          description: The message type 'text' | 'image'
-                        isForwarded:
-                          type: boolean
-                          description: Wheather the message was forwarded
-                        content:
-                          type: string
-                          description: The message text content (for type text) or photo path (for type image)
-                        authorId:
-                          type: integer
-                          description: The message author id
-                        createdAt:
-                          type: string
-                          format: date-time
-                          description: The message datetime of creation
-                        messageStatus:
-                          type: object
-                          description: The message status 'received' | 'read' with the id of the members who read it
-                          properties:
-                            status:
-                              type: string
-                              enum: [received, read]
-                              description: The status of the message, 'read' if all the members read the message, 'received' otherwise
-                            members:
-                              description: The member ids that read the message
-                              type: array
-                              items:
-                                type: integer
-                        comments:
-                          type: array
-                          description: List of emoji reactions to this message
-                          items:
-                            type: object
-                            properties:
-                              authorId:
-                                type: integer
-                                description: The user id of the user that reacted
-                              emoji:
-                                type: string
-                                description: The emoji reaction (Unicode)
-                              createdAt:
-                                type: string
-                                format: date-time
-                                description: The comment datetime of creation
-
+                $ref: "#/components/schemas/Conversation"
               example:
+                conversationId: 23
+                type: "group"
+                createdBy: 2
+                createdAt: "2025-07-29T14:48:00Z"
                 messages:
                   - messageId: 65
                     type: image
@@ -553,7 +586,7 @@ paths:
                     isForwarded: false
                     content: "AHHAAHH che ridere!"
                     authorId: 1
-                    created_at: "2025-09-29T15:00:00Z"
+                    createdAt: "2025-09-29T15:00:00Z"
                     messageStatus:
                       status: received
                       members: [1, 3]
@@ -580,7 +613,7 @@ paths:
                 type: "object"
                 properties:
                   message:
-                    type: "string"
+                    type: string
                     description: The user doesn't belong to this conversation.
               example:
                 message: User doesn't belong to the conversation
@@ -617,6 +650,9 @@ paths:
                 content:
                   type: string
                   description: Text content of the message
+                  minLength: 0
+                  maxLength: 1000000
+                  pattern: "^.{1,1000000}$"
             example:
               type: text
               content: "Hello, how are you?"
@@ -635,6 +671,8 @@ paths:
                 file:
                   type: string
                   format: binary
+                  minLength: 0
+                  maxLength: 2000000
                   description: >
                     Image file to send. Allowed types: jpeg, png, webp.
                     Max size: 2MB.
@@ -664,23 +702,19 @@ paths:
                     type: string
                     format: date-time
                     description: The datetime of message creation
+              example:
+                messageId: 101
+                type: text
+                content: "Ciao Caro"
+                createdAt: "2025-10-17T18:30:00Z"
         "400":
           description: Invalid input image
           content:
             application/json:
               schema:
-                description: A descriptive message of different failures
-                type: "object"
-                properties:
-                  message:
-                    type: "string"
-                    description: >
-                      error:
-                      * `First Error` - Wrong file format. Only jpeg, png and webp are allowed.
-                      * `Second Error`  - File too big. The image can't be bigger than 2Mb.
-                    enum:
-                      - wrong_file_format
-                      - file_too_big
+                $ref: "#/components/schemas/ErrorMessage"
+              example:
+                message: "Wrong File Format"
         "403":
           description: The user doesn't belong to the conversation
           content:
@@ -690,7 +724,7 @@ paths:
                 type: "object"
                 properties:
                   message:
-                    type: "string"
+                    type: string
                     description: The user doesn't belong to this conversation.
               example:
                 message: User doesn't belong to the conversation
@@ -726,6 +760,8 @@ paths:
                 messages:
                   description: Array of message ids
                   type: array
+                  minItems: 0
+                  maxItems: 10000
                   items:
                     type: integer
                     format: int64
@@ -743,7 +779,7 @@ paths:
                 type: "object"
                 properties:
                   message:
-                    type: "string"
+                    type: string
                     description: Invalid request (e.g., missing message IDs or invalid JSON)
               example:
                 message: Invalid request (e.g., missing message IDs or invalid JSON)
@@ -757,7 +793,7 @@ paths:
                 type: "object"
                 properties:
                   message:
-                    type: "string"
+                    type: string
                     description: The user doesn't belong to this conversation.
               example:
                 message: User doesn't belong to the conversation
@@ -818,7 +854,7 @@ paths:
                 type: "object"
                 properties:
                   message:
-                    type: "string"
+                    type: string
                     description: Conversation not found.
               example:
                 message: Conversation not found.
@@ -852,6 +888,8 @@ paths:
                   description: the emoji string (simplified, check source code for more informations validation.emoji.go)
                   type: string
                   example: ❤️
+                  minLength: 0
+                  maxLength: 20
                   pattern: '^[\u2000-\u2BFF\uE000-\uFFFF]+$'
 
         required: true
@@ -874,19 +912,9 @@ paths:
           content:
             application/json:
               schema:
-                description: A descriptive message of different failures
-                type: "object"
-                properties:
-                  message:
-                    description: >
-                      error:
-                      * `First Error` -Invalid emoji unicode 
-                      * `Second Error`  - You have already reacted to this message
-                    enum:
-                      - invalid_emoji_unicode
-                      - already_reacted_to_message
-                example:
-                  message: Invalid emoji unicode
+                $ref: "#/components/schemas/ErrorMessage"
+              example:
+                message: "Invalid Emoji Unicode"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
@@ -919,7 +947,7 @@ paths:
                 type: "object"
                 properties:
                   message:
-                    type: "string"
+                    type: string
                     description: Reaction not found.
               example:
                 message: Reaction not found.
@@ -1019,6 +1047,10 @@ paths:
               schema:
                 type: object
                 description: A descriptive message of success
+                properties:
+                  message:
+                    type: string
+                    description: The success message
                 example:
                   message: Member added to the group successfully
 
@@ -1040,18 +1072,9 @@ paths:
           content:
             application/json:
               schema:
-                description: A descriptive message of different failures
-                type: object
-                properties:
-                  message:
-                    type: string
-                    description: >
-                      error:
-                      * `First Error` - User not found 
-                      * `Second Error` - Group not found
-                    enum:
-                      - user_not_found
-                      - group_not_found
+                $ref: "#/components/schemas/ErrorMessage"
+              example:
+                message: "User Not Found"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
     delete:
@@ -1119,6 +1142,9 @@ paths:
                 name:
                   type: string
                   description: the new group name
+                  minLength: 1
+                  maxLength: 30
+                  pattern: "^.{1,30}$"
             example:
               name: I ragazzi del calcetto
       responses:
@@ -1129,6 +1155,10 @@ paths:
               schema:
                 description: A descriptive message of success
                 type: object
+                properties:
+                  message:
+                    type: string
+                    description: The success message
                 example:
                   message: Group name changed successfully.
 
@@ -1137,18 +1167,10 @@ paths:
           content:
             application/json:
               schema:
-                description: A descriptive message of failure
-                type: object
-                properties:
-                  message:
-                    type: string
-                    description: >
-                      error:
-                      * `First Error` - Invalid group name 
-                      * `Second Error` - Forbidden
-                    enum:
-                      - invalid_group_name
-                      - forbidden
+                $ref: "#/components/schemas/ErrorMessage"
+              example:
+                message: "Invalid Group Name"
+
         "404":
           description: Not Found
           content:
@@ -1205,26 +1227,18 @@ paths:
                     type: string
                     example: groups/1.png
                     description: the path of the group image
+              example:
+                message: "Group photo updated"
+                photoPath: "groups/5.png"
         "400":
           description: Invalid input image
           content:
             application/json:
               schema:
-                description: A descriptive message of failure
-                type: "object"
-                properties:
-                  message:
-                    type: "string"
-                    description: >
-                      error:
-                      * `First Error`  - No file uploaded.
-                      * `Second Error` - Wrong file format. Only jpeg, png and webp are allowed.
-                      * `Third Error`  - File too big. The image can't be bigger than 2Mb.
-                    enum:
-                      - no_file_uploaded
-                      - wront_file_format
-                      - file_too_big
-                    default: "Wrong file format. Only jpeg, png and webp are allowed."
+                $ref: "#/components/schemas/ErrorMessage"
+              example:
+                message: "Wrong File Format"
+
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
@@ -1264,16 +1278,16 @@ paths:
                 users:
                   - userId: 1
                     username: alemilos
-                    photoPath: "groups/7/photo.png"
+                    photoPath: "profiles/1.png"
                   - userId: 2
                     username: mistermaster
-                    photoPath: null
+                    photoPath: "profiles/2.png"
                   - userId: 3
                     username: johndoe
-                    photoPath: "groups/7/photo.png"
+                    photoPath: "profiles/3.png"
                   - userId: 4
                     username: viral_man
-                    photoPath: null
+                    photoPath: "profiles/4.png"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
@@ -1299,8 +1313,11 @@ paths:
                   minLength: 1
                   maxLength: 30
                   description: The name of the group
+                  pattern: "^.{1,30}$"
                 members:
                   type: array
+                  minItems: 0
+                  maxItems: 50
                   description: List of user ids to add to the group
                   items:
                     type: integer
@@ -1322,5 +1339,8 @@ paths:
                   name:
                     type: string
                     description: The group name
+              example:
+                groupId: 12
+                photoPath: "groups/12.png"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
