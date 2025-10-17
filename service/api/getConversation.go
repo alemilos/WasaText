@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time"
 
+	"git.sapienzaapps.it/fantasticcoffee/fantastic-coffee-decaffeinated/service/api/constants"
 	"git.sapienzaapps.it/fantasticcoffee/fantastic-coffee-decaffeinated/service/api/reqcontext"
 	"git.sapienzaapps.it/fantasticcoffee/fantastic-coffee-decaffeinated/service/database"
 	"github.com/julienschmidt/httprouter"
@@ -24,6 +25,13 @@ type Comment struct {
 	CreatedAt string `json:"created_at"`
 }
 
+type ConversationMember struct {
+	UserID    int64  `json:"user_id"`
+	PhotoPath string `json:"photo_path"`
+	Username  string `json:"username"`
+	Role      string `json:"role"`
+}
+
 type ConversationMessage struct {
 	MessageID     int64         `json:"message_id"`
 	Type          string        `json:"type"`
@@ -36,7 +44,14 @@ type ConversationMessage struct {
 }
 
 type GetConversationResponse struct {
-	Messages []ConversationMessage `json:"messages"`
+	ConversationID int64                 `json:"conversation_id"`
+	Name           string                `json:"name,omitempty"` // shown only for group chats
+	Type           string                `json:"type"`
+	PhotoPath      string                `json:"photo_path,omitempty"` // shown only for group chats
+	CreatedBy      int64                 `json:"created_by"`
+	CreatedAt      time.Time             `json:"created_at"`
+	Members        []ConversationMember  `json:"members,omitempty"` // shown only for group chats
+	Messages       []ConversationMessage `json:"messages"`
 }
 
 // ---------- Converters (Database → API) ----------
@@ -96,6 +111,39 @@ func (rt *_router) databaseToApiConversationMessages(
 	return apiMessages, nil
 }
 
+func (rt *_router) databaseToApiMembers(conversationID int64, memberIDs []int64) ([]ConversationMember, error) {
+	apiMembers := make([]ConversationMember, 0, len(memberIDs))
+
+	for _, id := range memberIDs {
+		user, err := rt.db.GetUserById(id)
+		if err != nil {
+			rt.baseLogger.Errorf("failed GetUserById(%d): %v", id, err)
+			return nil, err
+		}
+
+		role := constants.ROLE_MEMBER
+		role, err = rt.db.GetRoleByConversation(conversationID, id)
+		if err != nil {
+			rt.baseLogger.Errorf("failed GetRoleByConversation(%d, %d): %v", conversationID, id, err)
+			return nil, err
+		}
+
+		photo := ""
+		if user.PhotoPath != nil {
+			photo = *user.PhotoPath
+		}
+
+		apiMembers = append(apiMembers, ConversationMember{
+			UserID:    user.ID,
+			PhotoPath: photo,
+			Username:  user.Username,
+			Role:      role,
+		})
+	}
+
+	return apiMembers, nil
+}
+
 // ---------- Handler ----------
 
 func (rt *_router) getConversation(
@@ -108,6 +156,12 @@ func (rt *_router) getConversation(
 	convID, err := strconv.ParseInt(convIDStr, 10, 64)
 	if err != nil {
 		http.Error(w, ErrorMessage("Invalid conversation id"), http.StatusBadRequest)
+		return
+	}
+
+	conversation, err := rt.db.GetConversationByID(convID)
+	if err != nil {
+		http.Error(w, ErrorMessage(InternalServerError), http.StatusInternalServerError)
 		return
 	}
 
@@ -135,7 +189,28 @@ func (rt *_router) getConversation(
 		return
 	}
 
-	resp := GetConversationResponse{Messages: apiMessages}
+	resp := GetConversationResponse{
+		ConversationID: conversation.ID,
+		CreatedBy:      conversation.CreatedBy,
+		CreatedAt:      conversation.CreatedAt,
+		Type:           conversation.Type,
+		Messages:       apiMessages,
+	}
+
+	if conversation.Type == constants.CONV_GROUP {
+		apiMembers, err := rt.databaseToApiMembers(convID, members)
+		if err != nil {
+			http.Error(w, ErrorMessage(InternalServerError), http.StatusInternalServerError)
+			return
+		}
+		resp.Members = apiMembers
+		if conversation.Name != nil {
+			resp.Name = *conversation.Name
+		}
+		if conversation.PhotoPath != nil {
+			resp.PhotoPath = *conversation.PhotoPath
+		}
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)

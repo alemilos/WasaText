@@ -1,6 +1,7 @@
 package database
 
 import (
+	"database/sql"
 	"fmt"
 	"time"
 )
@@ -50,6 +51,27 @@ func (db *appdbimpl) IsMember(conversationID, userID int64) error {
 	return nil
 }
 
+func (db *appdbimpl) SetRole(conversationID, userID int64, newRole string) error {
+	result, err := db.c.Exec(`
+		UPDATE conversation_members
+		SET role = ?
+		WHERE conversation_id = ? AND user_id = ?
+	`, newRole, conversationID, userID)
+	if err != nil {
+		return fmt.Errorf("failed to update role for user %d in conversation %d: %w", userID, conversationID, err)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to get rows affected: %w", err)
+	}
+	if rowsAffected == 0 {
+		return fmt.Errorf("user %d is not a member of conversation %d", userID, conversationID)
+	}
+
+	return nil
+}
+
 func (db *appdbimpl) GetMembersByConversation(conversationID int64) ([]int64, error) {
 	rows, err := db.c.Query(`SELECT user_id FROM conversation_members WHERE conversation_id = ?`, conversationID)
 	if err != nil {
@@ -71,4 +93,27 @@ func (db *appdbimpl) GetMembersByConversation(conversationID int64) ([]int64, er
 	}
 
 	return members, nil
+}
+
+func (db *appdbimpl) GetRoleByConversation(conversationID, userID int64) (string, error) {
+	var role sql.NullString
+
+	err := db.c.QueryRow(`
+		SELECT role 
+		FROM conversation_members 
+		WHERE conversation_id = ? AND user_id = ?
+	`, conversationID, userID).Scan(&role)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return "", fmt.Errorf("user %d is not a member of conversation %d", userID, conversationID)
+		}
+		return "", fmt.Errorf("failed to get role for user %d in conversation %d: %w", userID, conversationID, err)
+	}
+
+	if !role.Valid {
+		return "", nil // role is NULL in database
+	}
+
+	return role.String, nil
 }

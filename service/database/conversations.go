@@ -2,7 +2,10 @@ package database
 
 import (
 	"database/sql"
+	"fmt"
 	"time"
+
+	"git.sapienzaapps.it/fantasticcoffee/fantastic-coffee-decaffeinated/service/api/constants"
 )
 
 // Conversation represents a chat (private or group)
@@ -27,10 +30,10 @@ func (db *appdbimpl) CreatePrivateConversation(user1ID, user2ID int64) (*Convers
 	id, _ := res.LastInsertId()
 
 	// Add both users as members
-	if err := db.AddMember(id, user1ID, "member"); err != nil {
+	if err := db.AddMember(id, user1ID, constants.ROLE_MEMBER); err != nil {
 		return nil, err
 	}
-	if err := db.AddMember(id, user2ID, "member"); err != nil {
+	if err := db.AddMember(id, user2ID, constants.ROLE_MEMBER); err != nil {
 		return nil, err
 	}
 
@@ -114,7 +117,7 @@ func (db *appdbimpl) CreateGroupConversation(name string, creatorID int64, membe
 	convID, _ := res.LastInsertId()
 
 	// Add creator as admin
-	if err := db.AddMember(convID, creatorID, "admin"); err != nil {
+	if err := db.AddMember(convID, creatorID, constants.ROLE_ADMIN); err != nil {
 		return nil, err
 	}
 
@@ -123,10 +126,52 @@ func (db *appdbimpl) CreateGroupConversation(name string, creatorID int64, membe
 		if id == creatorID {
 			continue // already added as admin
 		}
-		if err := db.AddMember(convID, id, "member"); err != nil {
+		if err := db.AddMember(convID, id, constants.ROLE_MEMBER); err != nil {
 			return nil, err
 		}
 	}
 
 	return db.GetConversationByID(convID)
+}
+
+func (db *appdbimpl) SetGroupName(conversationID int64, groupName string) error {
+	res, err := db.c.Exec(`
+		UPDATE conversations 
+		SET name = ? 
+		WHERE id = ? AND type = 'group'`, groupName, conversationID)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return fmt.Errorf("conversation not found or not a group")
+	}
+
+	return nil
+}
+
+func (db *appdbimpl) SetGroupPhoto(conversationID int64, photoPath string) error {
+	res, err := db.c.Exec(`
+		UPDATE conversations
+		SET photo_path = ?
+		WHERE id = ? AND type = 'group'`, photoPath, conversationID)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return fmt.Errorf("conversation not found or not a group")
+	}
+
+	return nil
 }

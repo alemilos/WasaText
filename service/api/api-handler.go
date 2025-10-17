@@ -24,6 +24,12 @@ func (rt *_router) Handler() http.Handler {
 	// Comments
 	rt.router.PUT("/messages/:id/comment", rt.wrap(rt.commentMessage))
 	rt.router.DELETE("/messages/:id/comment", rt.wrap(rt.uncommentMessage))
+	// Groups
+	rt.router.POST("/groups", rt.wrap(rt.createGroup))
+	rt.router.POST("/groups/:id/members", rt.wrap(rt.addToGroup))
+	rt.router.DELETE("/groups/:id/members", rt.wrap(rt.leaveGroup))
+	rt.router.PUT("/groups/:id/name", rt.wrap(rt.setGroupName))
+	rt.router.PUT("/groups/:id/photo", rt.wrap(rt.setGroupPhoto))
 
 	// Special routes
 	rt.router.GET("/liveness", rt.liveness)

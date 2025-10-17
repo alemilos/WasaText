@@ -52,10 +52,16 @@ type AppDatabase interface {
 	GetConversationByID(id int64) (*Conversation, error)
 	GetConversationsByUserID(userID int64) ([]Conversation, error)
 	CreateGroupConversation(name string, creatorID int64, memberIDs []int64) (*Conversation, error)
+	SetGroupName(conversationID int64, groupName string) error
+	SetGroupPhoto(conversationID int64, photoPath string) error
 
 	// Conversation Members
+	AddMember(conversationID, userID int64, role string) error
+	RemoveMember(conversationID, userID int64) error
 	IsMember(conversationID, userID int64) error
+	SetRole(conversationID, userID int64, newRole string) error
 	GetMembersByConversation(conversationID int64) ([]int64, error)
+	GetRoleByConversation(conversationID, userID int64) (string, error)
 
 	// Messages
 	CreateMessage(conversationID, authorID int64, msgType string, content string, isForwarded bool) (*Message, error)

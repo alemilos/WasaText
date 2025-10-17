@@ -5,3 +5,15 @@ const (
 	PROFILE_PHOTO_PATH = "/profiles"
 	GROUP_PHOTO_PATH   = "/groups"
 )
+
+// conversation types
+const (
+	CONV_GROUP   = "group"
+	CONV_PRIVATE = "private"
+)
+
+// roles
+const (
+	ROLE_ADMIN  = "admin"
+	ROLE_MEMBER = "member"
+)
