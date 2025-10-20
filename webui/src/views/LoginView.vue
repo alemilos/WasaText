@@ -1,32 +1,27 @@
 <script setup>
-	import "./style/LoginView.css";
-	import Logo from "../assets/images/logo.png";
-	import { hackerText } from "../utils/text";
-	import {useTemplateRef, onMounted} from 'vue'
-	import {useRouter} from 'vue-router'
-	import axios from '../services/axios'
+import "./style/LoginView.css";
+import Logo from "../assets/images/logo.png";
+import { hackerText } from "../utils/text";
+import { useTemplateRef, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import axios from "../services/axios";
+import { doLogin } from "../services/auth";
 
-	const title = useTemplateRef('title')
-	const username = useTemplateRef('username')
-	const router = useRouter()
+const title = useTemplateRef("title");
+const username = useTemplateRef("username");
+const router = useRouter();
 
-	async function submit(e) {
-			e.preventDefault();
-			if (!username.value || username.value === "") {
-				throw new Error("Invalid Username");
-			}
-			const res = await axios.post("/login", {username});
-		
-			if (res.status === 200){
-				router.push("/")
-			}
-		}
+async function submit(e) {
+	e.preventDefault();
+	const res = await doLogin(username);
+	if (res.status === 200) {
+		router.push("/");
+	}
+}
 
-	onMounted(() =>  {
-		hackerText(title.value); // apply hacker animation
-	})
-
-
+onMounted(() => {
+	hackerText(title.value); // apply hacker animation
+});
 </script>
 
 <template>
