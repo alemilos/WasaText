@@ -14,6 +14,7 @@ export function clearUserId() {
 }
 
 export function doLogin(username) {
+	console.log(username);
 	username = username.trim();
 	if (!username || username === "") {
 		throw new Error("Invalid Username");
