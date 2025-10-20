@@ -13,7 +13,7 @@ const router = useRouter();
 
 async function submit(e) {
 	e.preventDefault();
-	const res = await doLogin(username);
+	const res = await doLogin(username.value);
 	if (res.status === 200) {
 		router.push("/");
 	}
