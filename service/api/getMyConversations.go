@@ -11,14 +11,14 @@ import (
 )
 
 type Conversation struct {
-	ConversationID int64     `json:"conversationId"`
-	Type           string    `json:"type"` // "private" | "group"
-	Name           *string   `json:"name"`
-	PhotoPath      *string   `json:"photoPath"`
-	CreatedBy      int64     `json:"createdBy"`
-	CreatedAt      time.Time `json:"createdAt"`
-	LastMessage    *Message  `json:"lastMessage"`
-	OtherParticipantID    *int64    `json:"otherParticipantId,omitempty"` // if the conversation is private  
+	ConversationID     int64     `json:"conversationId"`
+	Type               string    `json:"type"` // "private" | "group"
+	Name               *string   `json:"name"`
+	PhotoPath          *string   `json:"photoPath"`
+	CreatedBy          int64     `json:"createdBy"`
+	CreatedAt          time.Time `json:"createdAt"`
+	LastMessage        *Message  `json:"lastMessage"`
+	OtherParticipantID *int64    `json:"otherParticipantId,omitempty"` // if the conversation is private
 }
 
 type Message struct {
@@ -67,7 +67,7 @@ func (rt *_router) getMyConversations(w http.ResponseWriter, r *http.Request, ps
 			if err == nil {
 				for _, m := range members {
 					if m != userID {
-						apiConversations[i].OtherParticipantID= &m
+						apiConversations[i].OtherParticipantID = &m
 						break
 					}
 				}
