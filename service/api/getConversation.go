@@ -44,15 +44,15 @@ type ConversationMessage struct {
 }
 
 type GetConversationResponse struct {
-	ConversationID int64                 `json:"conversationId"`
-	Name           string                `json:"name,omitempty"` // shown only for group chats
-	Type           string                `json:"type"`
-	PhotoPath      string                `json:"photoPath,omitempty"` // shown only for group chats
-	CreatedBy      int64                 `json:"createdBy"`
-	CreatedAt      time.Time             `json:"createdAt"`
-	Members        []ConversationMember  `json:"members,omitempty"` // shown only for group chats
-	Messages       []ConversationMessage `json:"messages"`
-	OtherParticipantID *int64    `json:"otherParticipantId,omitempty"` // if the conversation is private
+	ConversationID     int64                 `json:"conversationId"`
+	Name               string                `json:"name,omitempty"` // shown only for group chats
+	Type               string                `json:"type"`
+	PhotoPath          string                `json:"photoPath,omitempty"` // shown only for group chats
+	CreatedBy          int64                 `json:"createdBy"`
+	CreatedAt          time.Time             `json:"createdAt"`
+	Members            []ConversationMember  `json:"members,omitempty"` // shown only for group chats
+	Messages           []ConversationMessage `json:"messages"`
+	OtherParticipantID *int64                `json:"otherParticipantId,omitempty"` // if the conversation is private
 }
 
 // ---------- Converters (Database → API) ----------
@@ -212,15 +212,15 @@ func (rt *_router) getConversation(
 			resp.PhotoPath = *conversation.PhotoPath
 		}
 	} else {
-			members, err := rt.db.GetMembersByConversation(conversation.ID)
-			if err == nil {
-				for _, m := range members {
-					if m != ctx.User.ID{
-						resp.OtherParticipantID = &m
-						break
-					}
+		members, err := rt.db.GetMembersByConversation(conversation.ID)
+		if err == nil {
+			for _, m := range members {
+				if m != ctx.User.ID {
+					resp.OtherParticipantID = &m
+					break
 				}
 			}
+		}
 	}
 
 	w.Header().Set("Content-Type", "application/json")
