@@ -12,7 +12,7 @@ import (
 type User struct {
 	UserID    int64   `json:"userId"`
 	Username  string  `json:"username"`
-	PhotoPath *string `json:"photo_path"`
+	PhotoPath *string `json:"photoPath"`
 }
 
 // a serializer, converter from database user to api response user.

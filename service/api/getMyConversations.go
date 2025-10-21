@@ -14,19 +14,20 @@ type Conversation struct {
 	ConversationID int64     `json:"conversationId"`
 	Type           string    `json:"type"` // "private" | "group"
 	Name           *string   `json:"name"`
-	PhotoPath      *string   `json:"photo_path"`
-	CreatedBy      int64     `json:"created_by"`
-	CreatedAt      time.Time `json:"created_at"`
+	PhotoPath      *string   `json:"photoPath"`
+	CreatedBy      int64     `json:"createdBy"`
+	CreatedAt      time.Time `json:"createdAt"`
 	LastMessage    *Message  `json:"lastMessage"`
+	OtherParticipantID    *int64    `json:"otherParticipantId,omitempty"` // if the conversation is private  
 }
 
 type Message struct {
 	ID          int64     `json:"id"`
 	Type        string    `json:"type"` // "text" | "image"
-	IsForwarded bool      `json:"is_forwarded"`
-	AuthorID    int64     `json:"author_id"`
+	IsForwarded bool      `json:"isForwarded"`
+	AuthorID    int64     `json:"authorId"`
 	Content     string    `json:"content"`
-	CreatedAt   time.Time `json:"created_at"`
+	CreatedAt   time.Time `json:"createdAt"`
 }
 
 type getMyConversationsResponse struct {
@@ -61,6 +62,18 @@ func (rt *_router) getMyConversations(w http.ResponseWriter, r *http.Request, ps
 	apiConversations := databaseToApiConversations(conversations)
 
 	for i, conversation := range apiConversations {
+		if conversation.Type == "private" {
+			members, err := rt.db.GetMembersByConversation(conversation.ConversationID)
+			if err == nil {
+				for _, m := range members {
+					if m != userID {
+						apiConversations[i].OtherParticipantID= &m
+						break
+					}
+				}
+			}
+		}
+
 		lastMsg, err := rt.db.GetLastMessageByConversation(conversation.ConversationID)
 		if err == nil && lastMsg != nil {
 			apiConversations[i].LastMessage = &Message{

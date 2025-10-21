@@ -15,7 +15,7 @@ type doLoginRequest struct {
 type doLoginResponse struct {
 	ID        int64   `json:"id"`
 	Username  string  `json:"username"`
-	PhotoPath *string `json:"photo_path"`
+	PhotoPath *string `json:"photoPath"`
 }
 
 // login endpoint handler
