@@ -14,13 +14,23 @@ axiosInstance.interceptors.request.use((config) => {
 	return config;
 });
 
-axiosInstance.interceptors.response.use(async (response) => {
-	if (response && response.status === 401) {
-		// logout the user when NOT AUTHORIZED
-		await router.logoutAndRedirect();
+axiosInstance.interceptors.response.use(
+	async (response) => {
+		if (response && response.status === 401) {
+			// logout the user when NOT AUTHORIZED
+			await router.logoutAndRedirect();
+		}
+
+		return response;
+	},
+	async (error) => {
+		const status = error?.response?.status;
+		if (status === 401) {
+			// logout the user when NOT AUTHORIZED
+			await router.logoutAndRedirect();
+		}
 	}
-	return response;
-});
+);
 
 export async function get(url, config = {}) {
 	return axiosInstance.get(url, { ...config }).then((response) => response);

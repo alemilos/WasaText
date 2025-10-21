@@ -1,4 +1,4 @@
-export const endpoints = {
+export const Endpoints = {
 	// Authentication
 	doLogin: "/login",
 

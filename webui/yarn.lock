@@ -1427,6 +1427,7 @@ __metadata:
     vite: "npm:^3.0.4"
     vue: "npm:^3.2.37"
     vue-router: "npm:^4.1.3"
+    vue-toast-notification: "npm:^3.1.3"
   languageName: unknown
   linkType: soft
 
@@ -1517,6 +1518,15 @@ __metadata:
   peerDependencies:
     vue: ^3.2.0
   checksum: 10/4bc65f103d5304bfa8319f2a013fb924ffd291dd5d236214aa6ce9ffa63c6609fb1bc9bff041e2aa7ba02d44d01083c18fbb9aa034b9d40f2ff9bfaa96e52eee
+  languageName: node
+  linkType: hard
+
+"vue-toast-notification@npm:^3.1.3":
+  version: 3.1.3
+  resolution: "vue-toast-notification@npm:3.1.3"
+  peerDependencies:
+    vue: ^3.0
+  checksum: 10/cac288b3d004114fcb2cf7379f5c91af6093649c5ba14ba810ae30ee09bf587dfa8204889f101839786a54e604c634837da8683fb86eeee4800afbf52bd1f6e0
   languageName: node
   linkType: hard
 

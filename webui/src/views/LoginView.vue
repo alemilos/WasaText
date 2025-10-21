@@ -2,25 +2,30 @@
 import "./style/LoginView.css";
 import Logo from "../assets/images/logo.png";
 import { hackerText } from "../utils/text";
-import { useTemplateRef, onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import axios from "../services/axios";
-import { doLogin } from "../services/auth";
+import { login } from "../stores/authStore";
+import { useToast } from "vue-toast-notification";
 
-const title = useTemplateRef("title");
-const username = useTemplateRef("username");
+const title = ref(null);
+const username = ref("");
 const router = useRouter();
+const $toast = useToast();
 
 async function submit(e) {
 	e.preventDefault();
-	const res = await doLogin(username.value);
-	if (res.status === 200) {
+
+	const res = await login(username.value);
+	if (res.ok) {
 		router.push("/");
+	} else {
+		const error = "Impossibile effettuare il login";
+		$toast.error(error);
 	}
 }
 
 onMounted(() => {
-	hackerText(title.value); // apply hacker animation
+	hackerText(title.value);
 });
 </script>
 
@@ -35,10 +40,12 @@ onMounted(() => {
 					con amici e familiari.
 				</p>
 			</div>
-			<form>
-				<input type="text" placeholder="username" ref="username" />
-				<button @click="submit">Accedi</button>
+
+			<form @submit="submit">
+				<input type="text" placeholder="username" v-model="username" />
+				<button type="submit">Accedi</button>
 			</form>
+
 			<div class="form-info">
 				<v-icon name="bi-info-circle" />
 				<p>
