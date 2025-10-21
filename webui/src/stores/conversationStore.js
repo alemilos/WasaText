@@ -32,7 +32,17 @@ function closeConversation() {
 	error.value = null;
 }
 
-function pushMessage(message) {}
+function pushMessage(message) {
+	if (!currentConversation.value) return;
+
+	// Ensure messages array exists
+	if (!currentConversation.value.messages) {
+		currentConversation.value.messages = [];
+	}
+
+	// Push new message and trigger reactivity
+	currentConversation.value.messages.push(message);
+}
 
 export const conversationStore = {
 	currentConversation,
@@ -40,4 +50,5 @@ export const conversationStore = {
 	error,
 	openConversation,
 	closeConversation,
+	pushMessage,
 };

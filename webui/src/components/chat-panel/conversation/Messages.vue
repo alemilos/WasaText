@@ -12,9 +12,6 @@ const messages = computed(
 const conversationType = computed(
 	() => conversationStore.currentConversation.value?.type
 );
-const otherId = computed(
-	() => conversationStore.currentConversation.value?.otherParticipantId
-);
 const userId = computed(() => auth.userId);
 
 const messagesContainer = ref(null);

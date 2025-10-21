@@ -8,6 +8,7 @@ import {
 	sendTextMessage,
 } from "../../../services/conversations";
 import { conversationStore } from "../../../stores/conversationStore";
+import { auth } from "../../../stores/authStore";
 
 const $toast = useToast();
 const messageText = ref("");
@@ -20,6 +21,8 @@ const currentConversation = computed(
 const conversationId = computed(
 	() => currentConversation.value?.conversationId ?? null
 );
+
+const userId = computed(() => auth.userId);
 
 const fileInputRef = ref(null);
 
@@ -49,17 +52,22 @@ function onFileChange(event) {
 
 async function sendMessage(conversationId) {
 	try {
+		let lastMessage = { authorId: userId };
+		let res;
 		if (selectedFile.value) {
 			// send image
-			await sendImageMessage(conversationId, selectedFile.value);
+			res = await sendImageMessage(conversationId, selectedFile.value);
 			selectedFile.value = null; // reset file
 		} else {
 			// send text
 			const text = messageText.value.trim();
 			if (!text) return;
-			await sendTextMessage(conversationId, text);
+			res = await sendTextMessage(conversationId, text);
 			messageText.value = ""; // reset text
 		}
+
+		lastMessage = { ...lastMessage, ...res.data };
+		conversationStore.pushMessage(lastMessage);
 	} catch (err) {
 		$toast.error("C'è stato un errore nel mandare il messaggio");
 	}

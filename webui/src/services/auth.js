@@ -17,7 +17,7 @@ export function clearUserId() {
 export function doLogin(username) {
 	username = username.trim();
 	if (!username || username === "") {
-		throw new Error("Invalid Username");
+		return { ok: false, error: "L'username non può essere vuoto" };
 	}
 
 	return post(Endpoints.doLogin, { username });

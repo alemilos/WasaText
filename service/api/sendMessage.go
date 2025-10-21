@@ -25,7 +25,7 @@ type sendMessageResponse struct {
 	MessageID int64     `json:"messageId"`
 	Type      string    `json:"type"`
 	Content   string    `json:"content"`
-	CreatedAt time.Time `json:"created_at"`
+	CreatedAt time.Time `json:"createdAt"`
 }
 
 func (rt *_router) sendMessage(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {

@@ -19,7 +19,7 @@ async function submit(e) {
 	if (res.ok) {
 		router.push("/");
 	} else {
-		const error = "Impossibile effettuare il login";
+		const error = res.error || "Impossibile effettuare il login";
 		$toast.error(error);
 	}
 }

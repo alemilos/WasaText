@@ -29,6 +29,8 @@ axiosInstance.interceptors.response.use(
 			// logout the user when NOT AUTHORIZED
 			await router.logoutAndRedirect();
 		}
+
+		return error;
 	}
 );
 

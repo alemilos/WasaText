@@ -7,7 +7,7 @@ const props = defineProps({
 	conversationType: String,
 });
 
-console.log("IMAGE:", props.message);
+const API_URL = __API_URL__;
 </script>
 
 <template>
@@ -18,7 +18,7 @@ console.log("IMAGE:", props.message);
 	>
 		<div class="image-content">
 			<img
-				:src="`${__API_URL__}/uploads/${message.content}`"
+				:src="`${API_URL}/uploads${message.content}`"
 				:alt="'Foto'"
 				class="message-image"
 			/>

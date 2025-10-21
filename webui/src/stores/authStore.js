@@ -15,9 +15,12 @@ async function login(username) {
 		localStorage.setItem(LocalStorage.userId, res.data.id);
 
 		return { ok: true };
-	} else {
-		return { ok: false };
 	}
+
+	return {
+		ok: false,
+		error: res?.error || res.response?.data?.message || res.response?.data,
+	};
 }
 
 export { auth, login };
