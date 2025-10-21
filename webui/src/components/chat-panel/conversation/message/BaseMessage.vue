@@ -2,6 +2,7 @@
 import { computed } from "vue";
 import { conversationStore } from "../../../../stores/conversationStore";
 import { auth } from "../../../../stores/authStore";
+import { usersStore } from "../../../../stores/usersStore";
 
 const props = defineProps({
 	message: { type: Object, required: true },
@@ -21,9 +22,13 @@ const formatTime = (dateString) => {
 	});
 };
 
-const showSender = computed(
-	() => props.conversationType === "group" && !props.isSent
-);
+const senderName = computed(() => {
+	const isGroup = props.conversationType === "group";
+	if (isGroup && !props.isSent) {
+		return usersStore.getUsername(props.message.authorId);
+	}
+	return null;
+});
 
 const getStatusText = computed(() => {
 	const status = props.message.messageStatus?.status;
@@ -45,8 +50,8 @@ const getStatusText = computed(() => {
 	<div :class="['base-message', alignment]">
 		<div :class="['message-bubble', bubbleColor]">
 			<!-- Sender name for group messages (only received) -->
-			<div v-if="showSender" class="sender-name">
-				~ {{ props.message.authorId }}
+			<div v-if="senderName" class="sender-name">
+				~ {{ senderName }}
 				<!-- You might want to map this to username -->
 			</div>
 
@@ -103,7 +108,7 @@ const getStatusText = computed(() => {
 }
 
 .sender-name {
-	font-size: 12px;
+	font-size: 14px;
 	font-weight: bold;
 	margin-bottom: 4px;
 	color: var(--color-white);
