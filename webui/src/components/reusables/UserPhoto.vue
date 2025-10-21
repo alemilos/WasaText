@@ -1,15 +1,16 @@
 <script setup>
-import { ref, watchEffect } from "vue";
-import fallbackUrl from "@/assets/images/default-avatar.png";
+import { computed, ref, watchEffect } from "vue";
+import userImage from "@/assets/images/default-avatar.png";
+import groupImage from "@/assets/images/default-group.png";
 
 const props = defineProps({
 	url: {
 		type: String,
 		default: null,
 	},
-	injectedFallbackUrl: {
+	type: {
 		type: String,
-		default: null,
+		default: "private",
 	},
 	size: {
 		type: Number,
@@ -17,21 +18,23 @@ const props = defineProps({
 	},
 });
 
-const fb = props.injectedFallbackUrl || fallbackUrl;
-const currentUrl = ref(fb);
+const fallbackImage = computed(() =>
+	props.type === "group" ? groupImage : userImage
+);
+const currentUrl = ref(fallbackImage.value);
 
 watchEffect(() => {
 	if (props.url) {
 		// console.log(`${__API_URL__}/uploads${props.url}`);
 		currentUrl.value = `${__API_URL__}/uploads${props.url}`;
 	} else {
-		currentUrl.value = fb;
+		currentUrl.value = fallbackImage.value;
 	}
 });
 
 // handle image load error → fallback
 const onError = () => {
-	currentUrl.value = fb;
+	currentUrl.value = fallbackImage.value;
 };
 </script>
 

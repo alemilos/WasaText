@@ -1,26 +1,129 @@
 .conversation-container {
 	width: 100%;
-	height: 100%;
+	height: 90vh;
 	display: flex;
 	flex-direction: column;
 }
 
 .conversationHeading-container {
 	width: 100%;
-	height: 180px;
+	height: 130px;
 	display: flex;
 	align-items: center;
 	padding: 0 20px;
 	border-bottom: 1px solid var(--color-white-20);
+	gap: 32px;
+}
+
+.conversationHeading-container {
+	cursor: pointer;
+	color: var(--color-white);
+	font-size: 22px;
 }
 
 .messages-container {
 	width: 100%;
-	height: 100%;
+	flex: 1;
+	overflow-y: scroll;
+	padding: 0 20px;
+	/* background-color: red; */
 }
 
 .messageHandler-container {
 	width: 100%;
-	background-color: blue;
 	height: 120px;
+	display: flex;
+	align-items: center;
+	padding: 0 20px;
+	gap: 20px;
+}
+
+.messageHandler-input-container {
+	position: relative;
+	width: 100%;
+}
+
+.messageHandler-input-container input {
+	border-radius: 8px;
+	background-color: black;
+	outline: none;
+	border: 1px solid var(--color-white-20);
+	width: 100%;
+	padding: 16px 50px 16px 8px;
+
+	color: var(--color-white);
+	font-size: 18px;
+}
+
+.messageHandler-image-button {
+	min-width: 42px;
+	min-height: 42px;
+	border-radius: 50%;
+	background-color: var(--color-green-primary);
+	border: none;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.messageHandler-image-button-input {
+	display: none;
+}
+
+.messageHandler-image-button img {
+	height: 26px;
+	width: 26px;
+}
+
+.messageHandler-submit-button {
+	cursor: pointer;
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	right: 10px;
+	min-width: 26px;
+	min-height: 30px;
+	border-radius: 50%;
+	border: none;
+}
+
+.messageHandler-input-wrapper {
+	position: relative;
+	flex: 1;
+}
+
+.selected-file-overlay {
+	position: absolute;
+	top: -50px; /* Position above the input */
+	left: 0;
+	right: 0;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 8px 12px;
+	border-radius: 8px;
+	border: 1px solid var(--color-white-20);
+	color: var(--color-white);
+	box-shadow: rgba(100, 100, 111, 0.2) 0px -4px 10px 0px;
+	/* box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px; */
+	/* box-shadow: rgba(17, 12, 46, 0.15) 0px 48px 100px 0px; */
+	background-color: var(--color-black);
+	z-index: 10;
+}
+
+.remove-file-button {
+	cursor: pointer;
+	background: #ff4444;
+	color: white;
+	border: none;
+	border-radius: 50%;
+	width: 20px;
+	height: 20px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	font-size: 16px;
+	line-height: 1;
 }

@@ -21,3 +21,7 @@
 	box-sizing: border-box;
 	font-family: "Jersey 15";
 }
+
+html {
+	background-color: var(--color-primary);
+}

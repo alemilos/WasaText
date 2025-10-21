@@ -71,3 +71,7 @@
 	right: 0;
 	bottom: -12px;
 }
+
+.lastMessagePreview-image-container p {
+	color: var(--color-green-primary);
+}

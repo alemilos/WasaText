@@ -153,7 +153,7 @@ func (rt *_router) sendMessage(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	// --- Step 4: update message content in DB ---
-	relPath := fmt.Sprintf("messages/%d/%s", convID, finalName)
+	relPath := path.Join(constants.MESSAGE_PHOTO_PATH, fmt.Sprintf("%d", convID), finalName)
 	if err := rt.db.UpdateMessageContent(msg.ID, relPath); err != nil {
 		ctx.Logger.WithError(err).Error("failed to update message content")
 		http.Error(w, ErrorMessage(InternalServerError), http.StatusInternalServerError)

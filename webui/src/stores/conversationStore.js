@@ -31,6 +31,9 @@ function closeConversation() {
 	currentConversation.value = null;
 	error.value = null;
 }
+
+function pushMessage(message) {}
+
 export const conversationStore = {
 	currentConversation,
 	isLoading,

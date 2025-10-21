@@ -1,5 +1,5 @@
 import { Endpoints } from "../config/endpoints";
-import { get, post } from "./axios";
+import { get, post, postForm } from "./axios";
 
 export function createConversation() {
 	return post(Endpoints.createConversation);
@@ -14,11 +14,17 @@ export function getConversation(conversationId) {
 	return get(url);
 }
 
-export function sendMessage() {
-	const { conversationId } = boh;
+export function sendTextMessage(conversationId, content) {
 	const url = Endpoints.sendMessage.replace(":id", conversationId);
+	return post(url, { type: "text", content });
+}
+export function sendImageMessage(conversationId, imageFile) {
+	const formData = new FormData();
+	formData.append("type", "image");
+	formData.append("file", imageFile);
 
-	return post(url);
+	const url = Endpoints.sendMessage.replace(":id", conversationId);
+	return postForm(url, formData);
 }
 
 export function readMessages() {

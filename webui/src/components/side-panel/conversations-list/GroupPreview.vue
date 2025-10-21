@@ -16,10 +16,7 @@ function handleClick() {
 
 <template>
 	<div class="conversationPreview-container" @click="handleClick">
-		<UserPhoto
-			:url="props.conversation?.photoPath"
-			:injectedFallbackUrl="defaultGroupImage"
-		/>
+		<UserPhoto :url="props.conversation?.photoPath" type="group" />
 		<LastMessagePreview
 			:conversationName="conversation?.name"
 			:type="conversation?.lastMessage?.type"
