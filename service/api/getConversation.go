@@ -20,38 +20,39 @@ type MessageStatus struct {
 }
 
 type Comment struct {
-	AuthorID  int64  `json:"author_id"`
+	AuthorID  int64  `json:"authorId"`
 	Emoji     string `json:"emoji"`
-	CreatedAt string `json:"created_at"`
+	CreatedAt string `json:"createdAt"`
 }
 
 type ConversationMember struct {
-	UserID    int64  `json:"user_id"`
-	PhotoPath string `json:"photo_path"`
+	UserID    int64  `json:"userId"`
+	PhotoPath string `json:"photoPath"`
 	Username  string `json:"username"`
 	Role      string `json:"role"`
 }
 
 type ConversationMessage struct {
-	MessageID     int64         `json:"message_id"`
+	MessageID     int64         `json:"messageId"`
 	Type          string        `json:"type"`
-	IsForwarded   bool          `json:"is_forwarded"`
+	IsForwarded   bool          `json:"isForwarded"`
 	Content       string        `json:"content"`
-	AuthorID      int64         `json:"author_id"`
-	CreatedAt     string        `json:"created_at"`
-	MessageStatus MessageStatus `json:"message_status"`
+	AuthorID      int64         `json:"authorId"`
+	CreatedAt     string        `json:"createdAt"`
+	MessageStatus MessageStatus `json:"messageStatus"`
 	Comments      []Comment     `json:"comments"`
 }
 
 type GetConversationResponse struct {
-	ConversationID int64                 `json:"conversation_id"`
+	ConversationID int64                 `json:"conversationId"`
 	Name           string                `json:"name,omitempty"` // shown only for group chats
 	Type           string                `json:"type"`
-	PhotoPath      string                `json:"photo_path,omitempty"` // shown only for group chats
-	CreatedBy      int64                 `json:"created_by"`
-	CreatedAt      time.Time             `json:"created_at"`
+	PhotoPath      string                `json:"photoPath,omitempty"` // shown only for group chats
+	CreatedBy      int64                 `json:"createdBy"`
+	CreatedAt      time.Time             `json:"createdAt"`
 	Members        []ConversationMember  `json:"members,omitempty"` // shown only for group chats
 	Messages       []ConversationMessage `json:"messages"`
+	OtherParticipantID *int64    `json:"otherParticipantId,omitempty"` // if the conversation is private
 }
 
 // ---------- Converters (Database → API) ----------
@@ -210,6 +211,16 @@ func (rt *_router) getConversation(
 		if conversation.PhotoPath != nil {
 			resp.PhotoPath = *conversation.PhotoPath
 		}
+	} else {
+			members, err := rt.db.GetMembersByConversation(conversation.ID)
+			if err == nil {
+				for _, m := range members {
+					if m != ctx.User.ID{
+						resp.OtherParticipantID = &m
+						break
+					}
+				}
+			}
 	}
 
 	w.Header().Set("Content-Type", "application/json")

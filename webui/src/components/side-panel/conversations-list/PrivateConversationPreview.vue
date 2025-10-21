@@ -28,7 +28,7 @@ watch(
 </script>
 
 <template>
-	<div class="conversation-container" @click="handleClick">
+	<div class="conversationPreview-container" @click="handleClick">
 		<UserPhoto :url="photoUrl" />
 		<LastMessagePreview
 			:conversationName="username"

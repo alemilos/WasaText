@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+		"git.sapienzaapps.it/fantasticcoffee/fantastic-coffee-decaffeinated/service/api/constants"
 	"git.sapienzaapps.it/fantasticcoffee/fantastic-coffee-decaffeinated/service/api/reqcontext"
 	"git.sapienzaapps.it/fantasticcoffee/fantastic-coffee-decaffeinated/service/database"
 	"github.com/julienschmidt/httprouter"
@@ -62,7 +63,7 @@ func (rt *_router) getMyConversations(w http.ResponseWriter, r *http.Request, ps
 	apiConversations := databaseToApiConversations(conversations)
 
 	for i, conversation := range apiConversations {
-		if conversation.Type == "private" {
+		if conversation.Type == constants.CONV_PRIVATE {
 			members, err := rt.db.GetMembersByConversation(conversation.ConversationID)
 			if err == nil {
 				for _, m := range members {

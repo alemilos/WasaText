@@ -15,7 +15,7 @@ function handleClick() {
 </script>
 
 <template>
-	<div class="conversation-container" @click="handleClick">
+	<div class="conversationPreview-container" @click="handleClick">
 		<UserPhoto
 			:url="props.conversation?.photoPath"
 			:injectedFallbackUrl="defaultGroupImage"

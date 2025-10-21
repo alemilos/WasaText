@@ -14,7 +14,6 @@ async function openConversation(conversationId) {
 	try {
 		const res = await getConversation(conversationId); // your API call
 		if (res.status === 200) {
-			console.log(res.data);
 			currentConversation.value = res.data;
 		} else {
 			error.value = `Failed to fetch conversation ${conversationId}`;
@@ -32,16 +31,10 @@ function closeConversation() {
 	currentConversation.value = null;
 	error.value = null;
 }
-
-function getCurrentConversation() {
-	return currentConversation.value;
-}
-
 export const conversationStore = {
 	currentConversation,
 	isLoading,
 	error,
 	openConversation,
 	closeConversation,
-	getCurrentConversation,
 };
