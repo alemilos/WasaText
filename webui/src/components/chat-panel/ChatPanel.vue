@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from "vue";
+import { computed, onMounted, onUnmounted } from "vue";
 import { conversationStore } from "@/stores/conversationStore";
 import UnselectedConversation from "./unselected-conversation/UnselectedConversation.vue";
 import Conversation from "./conversation/Conversation.vue";
@@ -8,6 +8,18 @@ import Conversation from "./conversation/Conversation.vue";
 const currentConversation = computed(
 	() => conversationStore.currentConversation.value
 );
+
+let pollInterval = null;
+
+onMounted(() => {
+	pollInterval = setInterval(() => {
+		conversationStore.pollConversation();
+	}, 3000);
+});
+
+onUnmounted(() => {
+	clearInterval(pollInterval);
+});
 </script>
 
 <template>

@@ -32,6 +32,25 @@ function closeConversation() {
 	error.value = null;
 }
 
+async function pollConversation() {
+	if (!currentConversation.value?.conversationId) return;
+
+	try {
+		const res = await getConversation(
+			currentConversation.value.conversationId
+		);
+		if (res.status === 200) {
+			const newData = res.data;
+
+			// update other fields (title, participants, etc.)
+			currentConversation.value = {
+				...currentConversation.value,
+				...newData,
+			};
+		}
+	} catch (err) {}
+}
+
 function pushMessage(message) {
 	if (!currentConversation.value) return;
 
@@ -50,5 +69,6 @@ export const conversationStore = {
 	error,
 	openConversation,
 	closeConversation,
+	pollConversation,
 	pushMessage,
 };
