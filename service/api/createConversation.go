@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"git.sapienzaapps.it/fantasticcoffee/fantastic-coffee-decaffeinated/service/api/constants"
 	"git.sapienzaapps.it/fantasticcoffee/fantastic-coffee-decaffeinated/service/api/reqcontext"
 	"github.com/julienschmidt/httprouter"
 )
@@ -14,10 +15,12 @@ type createConversationRequest struct {
 }
 
 type createConversationResponse struct {
-	ConversationID int64     `json:"conversationId"`
-	Type           string    `json:"type"`
-	CreatedBy      int64     `json:"createdBy"`
-	CreatedAt      time.Time `json:"createdAt"`
+	ConversationID     int64                `json:"conversationId"`
+	Type               string               `json:"type"`
+	CreatedBy          int64                `json:"createdBy"`
+	CreatedAt          time.Time            `json:"createdAt"`
+	Members            []ConversationMember `json:"members,omitempty"`            // shown only for group chats
+	OtherParticipantID *int64               `json:"otherParticipantId,omitempty"` // if the conversation is private
 }
 
 func (rt *_router) createConversation(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -59,16 +62,34 @@ func (rt *_router) createConversation(w http.ResponseWriter, r *http.Request, ps
 		return
 	}
 
+	var resp createConversationResponse
+
 	if conversation != nil {
 		// Existing conversation found -> return 200
-		w.WriteHeader(http.StatusOK)
-		_ = json.NewEncoder(w).Encode(createConversationResponse{
+		resp = createConversationResponse{
 			ConversationID: conversation.ID,
 			Type:           conversation.Type,
 			CreatedBy:      conversation.CreatedBy,
 			CreatedAt:      conversation.CreatedAt,
-		})
+		}
+
+		if conversation.Type == constants.CONV_GROUP {
+			members, err := rt.db.GetMembersByConversation(conversation.ID)
+			if err == nil {
+				apiMembers, err := rt.databaseToApiMembers(conversation.ID, members)
+				if err == nil {
+					resp.Members = apiMembers
+				}
+			}
+		} else {
+			resp.OtherParticipantID = &req.RecipientID
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_ = json.NewEncoder(w).Encode(resp)
 		return
+
 	}
 
 	// Create a new private conversation
@@ -78,12 +99,17 @@ func (rt *_router) createConversation(w http.ResponseWriter, r *http.Request, ps
 		return
 	}
 
+	resp = createConversationResponse{
+		ConversationID:     newConv.ID,
+		Type:               newConv.Type,
+		CreatedBy:          newConv.CreatedBy,
+		CreatedAt:          newConv.CreatedAt,
+		OtherParticipantID: &req.RecipientID,
+	}
+
 	// newly created conversation -> 201
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	_ = json.NewEncoder(w).Encode(createConversationResponse{
-		ConversationID: newConv.ID,
-		Type:           newConv.Type,
-		CreatedBy:      newConv.CreatedBy,
-		CreatedAt:      newConv.CreatedAt,
-	})
+	_ = json.NewEncoder(w).Encode(resp)
+
 }
