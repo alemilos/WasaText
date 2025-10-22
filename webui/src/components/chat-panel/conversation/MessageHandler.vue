@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed } from "vue";
-import imgIcon from "@/assets/images/image-icon.png";
+import GalleryIcon from "@/assets/icons/gallery-icon.svg";
 import sendMessageIcon from "@/assets/icons/send-message.svg";
 import { useToast } from "vue-toast-notification";
 import {
@@ -81,12 +81,13 @@ function onKeyPress(e) {
 <template>
 	<div class="messageHandler-container">
 		<button class="messageHandler-image-button" @click="onFileButtonClick">
-			<img :src="imgIcon" />
+			<img :src="GalleryIcon" />
 		</button>
 		<!-- Hidden input to handle file selection -->
 		<input
 			type="file"
 			ref="fileInputRef"
+			accept="image/png, image/jpeg, image/webp"
 			@change="onFileChange"
 			style="display: none"
 		/>

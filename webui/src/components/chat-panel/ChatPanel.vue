@@ -1,6 +1,4 @@
 <script setup>
-import "./ChatPanel.css";
-
 import { computed } from "vue";
 import { conversationStore } from "@/stores/conversationStore";
 import UnselectedConversation from "./unselected-conversation/UnselectedConversation.vue";
@@ -18,3 +16,14 @@ const currentConversation = computed(
 		<Conversation v-else :conversation="currentConversation" />
 	</div>
 </template>
+<style scoped>
+.chatPanel-container {
+	width: 100%;
+	min-width: 500px;
+	height: 90vh;
+	background-color: var(--color-black);
+	border: 1px solid var(--color-white-20);
+
+	border-radius: 8px;
+}
+</style>

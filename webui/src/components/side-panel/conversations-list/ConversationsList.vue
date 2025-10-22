@@ -1,5 +1,4 @@
 <script setup>
-import "./style/ConversationsList.css";
 import { getMyConversations } from "../../../services/conversations";
 import { ref, onMounted } from "vue";
 import GroupPreview from "./GroupPreview.vue";
@@ -38,3 +37,14 @@ function handleOpenConversation(conversationId) {
 		/>
 	</div>
 </template>
+
+<style scoped>
+.conversationsList-container {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+
+	overflow-y: scroll;
+	padding: 40px 25px 20px 25px;
+}
+</style>
