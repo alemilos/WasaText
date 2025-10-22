@@ -16,8 +16,8 @@ type createConversationRequest struct {
 type createConversationResponse struct {
 	ConversationID int64     `json:"conversationId"`
 	Type           string    `json:"type"`
-	CreatedBy      int64     `json:"created_by"`
-	CreatedAt      time.Time `json:"created_at"`
+	CreatedBy      int64     `json:"createdBy"`
+	CreatedAt      time.Time `json:"createdAt"`
 }
 
 func (rt *_router) createConversation(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
