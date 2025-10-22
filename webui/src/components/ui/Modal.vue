@@ -11,6 +11,7 @@
 	width: 600px;
 	height: 600px;
 	background-color: var(--color-primary);
-	padding: 8px;
+	padding: 16px;
+	border-radius: 8px;
 }
 </style>

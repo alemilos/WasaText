@@ -3,10 +3,7 @@
 <template>
 	<div class="unselectedConversation-container">
 		<div class="unselectedConversation-message">
-			<p>
-				Seleziona una conversazione o inizia a chattare per dare vita
-				alla tua conversazione!
-			</p>
+			<p>SELEZIONA UNA CONVERSAZIONE O CREANE UNA NUOVA!</p>
 		</div>
 	</div>
 </template>

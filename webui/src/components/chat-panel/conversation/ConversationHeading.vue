@@ -53,6 +53,6 @@ function handleOpenConversationInfo() {
 		@click="handleOpenConversationInfo"
 	>
 		<UserPhoto :url="photoPath" :type="conversationType" :size="90" />
-		<p>{{ conversationName }}</p>
+		<span>{{ conversationName }}</span>
 	</div>
 </template>

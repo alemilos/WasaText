@@ -1,8 +1,8 @@
 import { Endpoints } from "../config/endpoints";
 import { get, post, postForm } from "./axios";
 
-export function createConversation() {
-	return post(Endpoints.createConversation);
+export function createConversation(recipientId) {
+	return post(Endpoints.createConversation, { recipientId });
 }
 
 export function getMyConversations() {
