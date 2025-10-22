@@ -20,6 +20,9 @@ const props = defineProps({
 
 <template>
 	<div class="usersSelectorList-container">
+		<p class="usersSelectList-no-users" v-if="!users.length">
+			Non ci sono utenti con cui iniziare una conversazione!
+		</p>
 		<div
 			v-for="user in users"
 			:key="user.userId"
@@ -39,6 +42,9 @@ const props = defineProps({
 </template>
 
 <style scoped>
+.usersSelectList-no-users {
+	color: var(--color-red);
+}
 .usersSelector-container {
 	display: flex;
 	flex-direction: column;

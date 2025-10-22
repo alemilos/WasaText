@@ -1,20 +1,13 @@
 <script setup>
-import { getMyConversations } from "../../../services/conversations";
-import { ref, onMounted } from "vue";
+import { computed } from "vue";
 import GroupPreview from "./GroupPreview.vue";
 import PrivateConversationPreview from "./PrivateConversationPreview.vue";
 import { conversationStore } from "../../../stores/conversationStore";
+import { conversationsStore } from "../../../stores/conversationsStore";
 
-const conversations = ref([]);
-
-onMounted(async () => {
-	try {
-		const res = await getMyConversations();
-		if (res.status === 200) {
-			conversations.value = res.data.conversations;
-		}
-	} catch (err) {}
-});
+const conversations = computed(() =>
+	Object.values(conversationsStore.conversations)
+);
 
 const conversationMap = {
 	group: GroupPreview,
