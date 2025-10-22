@@ -4,6 +4,10 @@ import { conversationStore } from "../../../stores/conversationStore";
 import { usersStore } from "../../../stores/usersStore";
 import UserPhoto from "../../reusables/UserPhoto.vue";
 import defaultGroupImage from "@/assets/images/default-group.png";
+import { useModal } from "../../../hooks/useModal";
+import GroupInformationsModal from "../../modals/GroupInformationsModal.vue";
+import PrivateChatInformationsModal from "../../modals/PrivateChatInformationsModal.vue";
+const { openModal } = useModal();
 
 const currentConversation = computed(
 	() => conversationStore.currentConversation.value
@@ -30,10 +34,24 @@ const photoPath = computed(() => {
 	if (conv.type === "private") return usersStore.getPhotoUrl(otherId.value);
 	return null;
 });
+
+function handleOpenConversationInfo() {
+	const conv = currentConversation.value;
+	if (!conv) return;
+
+	if (conv.type === "group") {
+		openModal(GroupInformationsModal, { conversation: conv });
+	} else if (conv.type === "private") {
+		openModal(PrivateChatInformationsModal, { conversation: conv });
+	}
+}
 </script>
 
 <template>
-	<div class="conversationHeading-container">
+	<div
+		class="conversationHeading-container"
+		@click="handleOpenConversationInfo"
+	>
 		<UserPhoto :url="photoPath" :type="conversationType" :size="90" />
 		<p>{{ conversationName }}</p>
 	</div>
