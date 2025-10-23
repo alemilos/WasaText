@@ -60,9 +60,9 @@ export async function postForm(url, form, config = {}) {
 		.then((response) => response);
 }
 
-export async function del(url, config = {}) {
+export async function del(url, data = {}, config = {}) {
 	return axiosInstance
-		.delete(url, { ...config })
+		.delete(url, { data, ...config })
 		.then((response) => response);
 }
 

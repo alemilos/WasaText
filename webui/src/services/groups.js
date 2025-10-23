@@ -7,10 +7,9 @@ export function addToGroup() {
 	return post(url);
 }
 
-export function leaveGroup() {
-	const { groupId } = boh;
+export function leaveGroup(groupId, userId) {
 	const url = Endpoints.leaveGroup.replace(":id", groupId);
-	return del(url);
+	return del(url, { userId });
 }
 
 export function setGroupName() {

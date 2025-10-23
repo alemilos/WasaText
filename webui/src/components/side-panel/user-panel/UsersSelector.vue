@@ -4,6 +4,7 @@ import UserPhoto from "../../reusables/UserPhoto.vue";
 const props = defineProps({
 	users: {
 		type: Object,
+		default: [],
 	},
 	selectedUserId: {
 		// for one selection allowed
@@ -19,6 +20,10 @@ const props = defineProps({
 		type: Function,
 		required: true,
 	},
+	maxHeight: {
+		type: Number,
+		default: null,
+	},
 });
 
 function isSelected(userId) {
@@ -30,7 +35,12 @@ function isSelected(userId) {
 </script>
 
 <template>
-	<div class="usersSelectorList-container">
+	<div
+		class="usersSelectorList-container"
+		:style="{
+			maxHeight: props.maxHeight ? props.maxHeight + 'px' : null,
+		}"
+	>
 		<p class="usersSelectList-no-users" v-if="!users.length">
 			Non ci sono utenti con cui iniziare una conversazione!
 		</p>

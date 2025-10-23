@@ -29,7 +29,7 @@ func (rt *_router) deleteMessage(w http.ResponseWriter, r *http.Request, ps http
 	// === Check author ===
 	userID := ctx.User.ID
 	if msg.AuthorID != userID {
-		http.Error(w, ErrorMessage("Unauthorized"), http.StatusUnauthorized)
+		http.Error(w, ErrorMessage("Forbidden"), http.StatusForbidden)
 		return
 	}
 

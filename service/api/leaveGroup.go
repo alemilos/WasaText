@@ -51,13 +51,13 @@ func (rt *_router) leaveGroup(w http.ResponseWriter, r *http.Request, ps httprou
 
 	// make sure the requester is member of conversation
 	if err := rt.db.IsMember(convID, requesterID); err != nil {
-		http.Error(w, "User not in conversation", http.StatusUnauthorized)
+		http.Error(w, "User not in conversation", http.StatusForbidden)
 		return
 	}
 
 	// make sure the target user is in the group
 	if err := rt.db.IsMember(convID, req.UserId); err != nil {
-		http.Error(w, "User not in conversation", http.StatusUnauthorized)
+		http.Error(w, "User not in conversation", http.StatusForbidden)
 		return
 	}
 

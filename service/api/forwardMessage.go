@@ -33,7 +33,7 @@ func (rt *_router) forwardMessage(w http.ResponseWriter, r *http.Request, ps htt
 	// === Get requester’s user ID ===
 	userID := ctx.User.ID
 	if userID == 0 {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
 
