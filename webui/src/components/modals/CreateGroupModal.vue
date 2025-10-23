@@ -10,6 +10,7 @@ import { createGroup } from "../../services/groups";
 import { useToast } from "vue-toast-notification";
 import { getError } from "../../utils/getError";
 import { useModal } from "../../hooks/useModal";
+import { conversationsStore } from "../../stores/conversationsStore";
 
 const { closeModal } = useModal();
 const $toast = useToast();
@@ -36,11 +37,9 @@ async function handleConfirm() {
 	if (!selectedUsersIds.value?.length) return;
 
 	const res = await createGroup(groupName.value, selectedUsersIds.value);
-	console.log(res);
 	if (res.status === 201) {
 		$toast.success("Il gruppo è stato creato");
-		console.log(res.data);
-		// conversationsStore.addConversation(res.data);
+		conversationsStore.addConversation(res.data);
 		closeModal();
 	} else {
 		const err = getError(res, "Impossibile creare il gruppo");
