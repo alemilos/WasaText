@@ -68,7 +68,7 @@ function isSelected(userId) {
 	gap: 4px;
 	height: 100%;
 	overflow-y: scroll;
-	max-height: 420px;
+	max-height: 390px;
 }
 .userSelector-row-container {
 	border-radius: 8px;

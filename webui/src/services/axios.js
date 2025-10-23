@@ -24,6 +24,7 @@ axiosInstance.interceptors.response.use(
 		return response;
 	},
 	async (error) => {
+		console.log(error);
 		const status = error?.response?.status;
 		if (status === 401) {
 			// logout the user when NOT AUTHORIZED
