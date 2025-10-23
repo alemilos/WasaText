@@ -21,8 +21,8 @@ type createGroupResponse struct {
 	ConversationID int64     `json:"conversationId"`
 	Type           string    `json:"type"`
 	Name           string    `json:"name"`
-	CreatedBy      int64     `json:"created_by"`
-	CreatedAt      time.Time `json:"created_at"`
+	CreatedBy      int64     `json:"createdBy"`
+	CreatedAt      time.Time `json:"createdAt"`
 }
 
 func (rt *_router) createGroup(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {

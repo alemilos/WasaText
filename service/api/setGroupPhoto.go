@@ -17,7 +17,7 @@ import (
 
 type setGroupPhotoResponse struct {
 	Message   string `json:"message"`
-	PhotoPath string `json:"photo_path"`
+	PhotoPath string `json:"photoPath"`
 }
 
 // CleanupOldGroupPhotos deletes all existing group photos for a given conversationID,

@@ -11,7 +11,7 @@ import (
 )
 
 type leaveGroupRequest struct {
-	UserId int64 `json:"user_id"`
+	UserId int64 `json:"userId"`
 }
 
 func (rt *_router) leaveGroup(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {

@@ -41,7 +41,7 @@ func CleanupOldProfilePhotos(userID int64, uploadDir string, keepExt string) err
 
 type setMyPhotoResponse struct {
 	Message   string `json:"message"`
-	PhotoPath string `json:"photo_path"`
+	PhotoPath string `json:"photoPath"`
 }
 
 func (rt *_router) setMyPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {

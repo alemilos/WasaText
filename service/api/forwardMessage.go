@@ -10,7 +10,7 @@ import (
 )
 
 type forwardMessageRequest struct {
-	ConversationID int64 `json:"conversation_id"`
+	ConversationID int64 `json:"conversationId"`
 }
 
 func (rt *_router) forwardMessage(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {

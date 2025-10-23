@@ -11,7 +11,7 @@ import (
 )
 
 type addToGroupRequest struct {
-	UserId int64 `json:"user_id"`
+	UserId int64 `json:"userId"`
 }
 
 func (rt *_router) addToGroup(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
