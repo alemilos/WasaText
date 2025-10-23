@@ -25,8 +25,12 @@ const currentUrl = ref(fallbackImage.value);
 
 watchEffect(() => {
 	if (props.url) {
-		// console.log(`${__API_URL__}/uploads${props.url}`);
-		currentUrl.value = `${__API_URL__}/uploads${props.url}`;
+		// If it's a blob or already a full URL, use it directly
+		if (props.url.startsWith("blob:") || props.url.startsWith("http")) {
+			currentUrl.value = props.url;
+		} else {
+			currentUrl.value = `${__API_URL__}/uploads${props.url}`;
+		}
 	} else {
 		currentUrl.value = fallbackImage.value;
 	}

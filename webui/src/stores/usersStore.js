@@ -29,7 +29,25 @@ function getUsername(userId) {
 }
 
 function getPhotoUrl(userId) {
-	return users[userId]?.photoPath ?? null;
+	const path = users[userId]?.photoPath ?? null;
+	if (!path) return null;
+	// Add a version query string to bypass caching
+	return `${path}?v=${Date.now()}`;
+}
+
+function updatePhotoPath(userId, photoPath) {
+	if (!users[userId]) {
+		return;
+	}
+	// Add a version query string to bypass caching
+	users[userId].photoPath = `${photoPath}?v=${Date.now()}`;
+}
+
+function updateUsername(userId, username) {
+	if (!users[userId]) {
+		return;
+	}
+	users[userId].username = username;
 }
 
 export const usersStore = {
@@ -38,4 +56,6 @@ export const usersStore = {
 	getUser,
 	getUsername,
 	getPhotoUrl,
+	updatePhotoPath,
+	updateUsername,
 };

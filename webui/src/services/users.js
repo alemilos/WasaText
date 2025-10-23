@@ -1,12 +1,15 @@
 import { Endpoints } from "../config/endpoints";
-import { get, post, put } from "./axios";
+import { get, post, postForm, put } from "./axios";
 
-export function setMyUsername() {
-	return put(Endpoints.setMyUsername);
+export function setMyUsername(username) {
+	return put(Endpoints.setMyUsername, { username });
 }
 
-export function setMyPhoto() {
-	return post(Endpoints.setMyPhoto);
+export function setMyPhoto(imageFile) {
+	const formData = new FormData();
+	formData.append("file", imageFile);
+
+	return postForm(Endpoints.setMyPhoto, formData);
 }
 
 export function getUsers() {

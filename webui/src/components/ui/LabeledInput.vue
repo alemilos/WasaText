@@ -58,7 +58,7 @@ function handleInput(event) {
 	height: 100%;
 	padding: 8px 12px;
 	border: none;
-	border-radius: 16px;
+	border-radius: 8px;
 	background-color: #1a1a1a; /* bgPrimary equivalent */
 	color: white; /* textWhite equivalent */
 	outline: none;
