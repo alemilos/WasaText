@@ -18,10 +18,12 @@ export function sendTextMessage(conversationId, content) {
 	const url = Endpoints.sendMessage.replace(":id", conversationId);
 	return post(url, { type: "text", content });
 }
-export function sendImageMessage(conversationId, imageFile) {
+export function sendImageMessage(conversationId, imageFile, text) {
+	console.log(text);
 	const formData = new FormData();
 	formData.append("type", "image");
 	formData.append("file", imageFile);
+	formData.append("secondaryContent", text);
 
 	const url = Endpoints.sendMessage.replace(":id", conversationId);
 	return postForm(url, formData);

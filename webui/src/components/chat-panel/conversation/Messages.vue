@@ -5,6 +5,7 @@ import { conversationStore } from "../../../stores/conversationStore";
 import { auth } from "../../../stores/authStore";
 import TextMessage from "./message/TextMessage.vue";
 import ImageMessage from "./message/ImageMessage.vue";
+import isEqual from "lodash.isequal";
 
 const messages = computed(
 	() => conversationStore.currentConversation.value?.messages || []
@@ -17,14 +18,18 @@ const userId = computed(() => auth.userId);
 const messagesContainer = ref(null);
 
 // Scroll to bottom when messages change
+
 watch(
 	messages,
-	() => {
-		nextTick(() => {
-			scrollToBottom();
-		});
+	(newMessages, oldMessages) => {
+		// avoid scrolling if identical
+		if (!isEqual(newMessages, oldMessages)) {
+			nextTick(() => {
+				scrollToBottom();
+			});
+		}
 	},
-	{ deep: true }
+	{ deep: false } // avoid unnecessary nested reactivity
 );
 
 // Also scroll when component mounts

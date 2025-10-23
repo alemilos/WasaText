@@ -92,7 +92,6 @@ func (rt *_router) sendMessage(w http.ResponseWriter, r *http.Request, ps httpro
 
 	file, header, err := r.FormFile("file")
 	secondaryContent := r.FormValue("secondaryContent")
-	rt.baseLogger.Info(secondaryContent)
 	if err != nil {
 		http.Error(w, ErrorMessage("No File Uploaded"), http.StatusBadRequest)
 		return

@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"git.sapienzaapps.it/fantasticcoffee/fantastic-coffee-decaffeinated/service/api/reqcontext"
 	"git.sapienzaapps.it/fantasticcoffee/fantastic-coffee-decaffeinated/service/database"
@@ -10,9 +11,10 @@ import (
 )
 
 type User struct {
-	UserID    int64   `json:"userId"`
-	Username  string  `json:"username"`
-	PhotoPath *string `json:"photoPath"`
+	UserID    int64     `json:"userId"`
+	Username  string    `json:"username"`
+	PhotoPath *string   `json:"photoPath"`
+	CreatedAt time.Time `json:"createdAt"`
 }
 
 // a serializer, converter from database user to api response user.
@@ -23,6 +25,7 @@ func databaseToApiUsers(dbUsers []database.User) []User {
 			UserID:    u.ID,
 			Username:  u.Username,
 			PhotoPath: u.PhotoPath,
+			CreatedAt: u.CreatedAt,
 		}
 	}
 	return apiUsers

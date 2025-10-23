@@ -111,7 +111,7 @@ const displayedPhoto = computed(() => {
 <template>
 	<Modal>
 		<div class="editProfileModal-container">
-			<ModalTitle text="Informazioni profilo" />
+			<ModalTitle text="Modifica profilo" />
 			<p>
 				Queste sono le tue informazioni profilo, puoi anche modificarle.
 			</p>

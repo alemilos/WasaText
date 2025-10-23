@@ -22,8 +22,8 @@ const API_URL = __API_URL__;
 				:alt="'Foto'"
 				class="message-image"
 			/>
-			<div v-if="message.caption" class="image-caption">
-				{{ message.caption }}
+			<div v-if="message.secondaryContent" class="image-caption">
+				{{ message.secondaryContent }}
 			</div>
 		</div>
 	</BaseMessage>
@@ -34,18 +34,21 @@ const API_URL = __API_URL__;
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
+	align-items: flex-start;
 }
 
 .message-image {
 	max-width: 100%;
-	max-height: 300px;
+	max-height: 40vh;
+	height: auto;
+	width: auto;
 	border-radius: 8px;
-	object-fit: cover;
+	object-fit: contain;
 }
 
 .image-caption {
-	font-size: 14px;
-	color: #333;
+	color: var(--color-green-primary);
 	padding: 4px 0;
+	text-align: left;
 }
 </style>

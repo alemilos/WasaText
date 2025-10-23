@@ -10,7 +10,6 @@ import { createGroup } from "../../services/groups";
 import { useToast } from "vue-toast-notification";
 import { getError } from "../../utils/getError";
 import { useModal } from "../../hooks/useModal";
-import { conversationsStore } from "../../stores/conversationsStore";
 
 const { closeModal } = useModal();
 const $toast = useToast();

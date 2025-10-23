@@ -55,9 +55,14 @@ async function sendMessage(conversationId) {
 		let lastMessage = { authorId: userId };
 		let res;
 		if (selectedFile.value) {
-			// send image
-			res = await sendImageMessage(conversationId, selectedFile.value);
+			// send image && text
+			res = await sendImageMessage(
+				conversationId,
+				selectedFile.value,
+				messageText.value
+			);
 			selectedFile.value = null; // reset file
+			messageText.value = ""; // reset text
 		} else {
 			// send text
 			const text = messageText.value.trim();
@@ -100,14 +105,13 @@ function onKeyPress(e) {
 					placeholder="Scrivi un messaggio..."
 					v-model="messageText"
 					@keypress="onKeyPress"
-					:disabled="selectedFile"
 				/>
 
 				<!-- Container to show that image was selecgted -->
 				<div v-if="selectedFile" class="selected-file-overlay">
 					<span
-						>Hai selezionato l'immagine, non puoi mandare anche un
-						messaggio.</span
+						>Hai allegato un'immagine al messaggio, cancellala se
+						cambi idea.</span
 					>
 					<button
 						@click="selectedFile = null"

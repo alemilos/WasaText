@@ -3,6 +3,7 @@ import { computed } from "vue";
 import { conversationStore } from "../../../../stores/conversationStore";
 import { auth } from "../../../../stores/authStore";
 import { usersStore } from "../../../../stores/usersStore";
+import UserPhoto from "../../../reusables/UserPhoto.vue";
 
 const props = defineProps({
 	message: { type: Object, required: true },
@@ -30,6 +31,14 @@ const senderName = computed(() => {
 	return null;
 });
 
+const senderPhotoPath = computed(() => {
+	const isGroup = props.conversationType === "group";
+	if (isGroup && !props.isSent) {
+		return usersStore.getPhotoUrl(props.message.authorId);
+	}
+	return null;
+});
+
 const getStatusText = computed(() => {
 	const status = props.message.messageStatus?.status;
 	const members = props.message.messageStatus?.members || [];
@@ -49,16 +58,14 @@ const getStatusText = computed(() => {
 <template>
 	<div :class="['base-message', alignment]">
 		<div :class="['message-bubble', bubbleColor]">
-			<!-- Sender name for group messages (only received) -->
+			<!-- Sender name & photofor group messages (only received) -->
 			<div v-if="senderName" class="sender-name">
-				~ {{ senderName }}
-				<!-- You might want to map this to username -->
+				<UserPhoto :url="senderPhotoPath" :size="24" />
+				<span> ~ {{ senderName }} </span>
 			</div>
 
-			<!-- Message content slot -->
 			<slot></slot>
 
-			<!-- Status bar -->
 			<div class="status-bar">
 				<span class="time">{{ formatTime(message.createdAt) }}</span>
 				<span class="status" v-if="isSent">{{ getStatusText }}</span>
@@ -112,6 +119,10 @@ const getStatusText = computed(() => {
 	font-weight: bold;
 	margin-bottom: 4px;
 	color: var(--color-white);
+
+	display: flex;
+	gap: 8px;
+	align-items: center;
 }
 
 .status-bar {
