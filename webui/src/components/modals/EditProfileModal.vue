@@ -96,6 +96,7 @@ async function handleLogout() {
 	clearUserId();
 	router.push("/login");
 	closeModal();
+	location.reload(); // make sure to clear the app state without issues
 }
 
 const submitUsernameEnabled = computed(() => {

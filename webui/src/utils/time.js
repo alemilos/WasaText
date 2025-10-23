@@ -52,3 +52,15 @@ export function formatDate(isoDate) {
 
 	return `${day} ${month} ${year}`;
 }
+
+export function formatDay(isoDate) {
+	if (!isoDate) return "";
+
+	const date = new Date(isoDate);
+
+	return new Intl.DateTimeFormat("it-IT", {
+		day: "numeric",
+		month: "long",
+		year: "numeric",
+	}).format(date);
+}

@@ -32,6 +32,9 @@ watch(
 				clearInterval(intervalId);
 				intervalId = null;
 			}
+
+			conversationsStore.clearConversations();
+			usersStore.clearUsers();
 		}
 	},
 

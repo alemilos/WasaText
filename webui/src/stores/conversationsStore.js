@@ -32,9 +32,14 @@ function removeConversation(conversationId) {
 	delete conversations[conversationId];
 }
 
+function clearConversations() {
+	for (const key in conversations) delete conversations[key];
+}
+
 export const conversationsStore = {
 	conversations,
 	loadConversations,
 	addConversation,
 	removeConversation,
+	clearConversations,
 };

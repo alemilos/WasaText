@@ -35,6 +35,10 @@ function getPhotoUrl(userId) {
 	return `${path}?v=${Date.now()}`;
 }
 
+function getUserCreationTime(userId) {
+	return users[userId]?.createdAt;
+}
+
 function updatePhotoPath(userId, photoPath) {
 	if (!users[userId]) {
 		return;
@@ -50,12 +54,18 @@ function updateUsername(userId, username) {
 	users[userId].username = username;
 }
 
+function clearUsers() {
+	for (const key in users) delete users[key];
+}
+
 export const usersStore = {
 	users,
 	loadUsers,
 	getUser,
 	getUsername,
 	getPhotoUrl,
+	getUserCreationTime,
 	updatePhotoPath,
 	updateUsername,
+	clearUsers,
 };
