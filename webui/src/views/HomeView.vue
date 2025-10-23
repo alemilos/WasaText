@@ -5,20 +5,12 @@ import Logo from "../assets/images/logo.png";
 import "./style/HomeView.css";
 import { createUsers } from "../services/helpers";
 import { useToast } from "vue-toast-notification";
-import { clearUserId } from "../services/auth";
-import { useRouter } from "vue-router";
 
-const router = useRouter();
 const $toast = useToast();
 
 async function handleCreateUsers() {
 	await createUsers();
 	$toast.success("10 utenti creati, alcuni potrebbero già esistere");
-}
-
-async function handleLogout() {
-	clearUserId();
-	router.push("/login");
 }
 </script>
 
@@ -29,9 +21,6 @@ async function handleLogout() {
 			<div class="helpers-container">
 				<button class="helper-button" @click="handleCreateUsers">
 					Crea utenti velocemente
-				</button>
-				<button class="logout-button" @click="handleLogout">
-					Logout
 				</button>
 			</div>
 		</div>
@@ -79,9 +68,5 @@ async function handleLogout() {
 .helper-button:disabled {
 	opacity: 0.4;
 	cursor: not-allowed;
-}
-
-.logout-button {
-	background-color: var(--color-red);
 }
 </style>
