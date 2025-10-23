@@ -5,7 +5,7 @@ import "./style/Conversation.css";
 import defaultGroupImage from "@/assets/images/default-group.png";
 
 const props = defineProps({
-	conversation: { type: Object, default: {} },
+	conversation: { type: Object },
 	onOpenConversation: { type: Function, required: true },
 });
 

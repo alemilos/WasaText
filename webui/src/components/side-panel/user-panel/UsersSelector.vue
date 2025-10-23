@@ -4,7 +4,6 @@ import UserPhoto from "../../reusables/UserPhoto.vue";
 const props = defineProps({
 	users: {
 		type: Object,
-		default: [],
 	},
 	selectedUserId: {
 		// for one selection allowed

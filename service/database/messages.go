@@ -13,15 +13,16 @@ type Message struct {
 	ConversationID int64     `json:"conversation_id"`
 	AuthorID       int64     `json:"author_id"`
 	Content        string    `json:"content"`
+	SecondaryContent string `json:"secondary_content"`
 	CreatedAt      time.Time `json:"created_at"`
 }
 
 // CreateMessage inserts a new message into a conversation
-func (db *appdbimpl) CreateMessage(conversationID, authorID int64, msgType string, content string, isForwarded bool) (*Message, error) {
+func (db *appdbimpl) CreateMessage(conversationID, authorID int64, msgType string, content string, secondaryContent string, isForwarded bool) (*Message, error) {
 	res, err := db.c.Exec(`
-		INSERT INTO messages (type, is_forwarded, conversation_id, author_id, content)
+		INSERT INTO messages (type, is_forwarded, conversation_id, author_id, content, secondary_content)
 		VALUES (?, ?, ?, ?, ?)`,
-		msgType, boolToInt(isForwarded), conversationID, authorID, content)
+		msgType, boolToInt(isForwarded), conversationID, authorID, content, secondaryContent)
 	if err != nil {
 		return nil, err
 	}

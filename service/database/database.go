@@ -64,7 +64,7 @@ type AppDatabase interface {
 	GetRoleByConversation(conversationID, userID int64) (string, error)
 
 	// Messages
-	CreateMessage(conversationID, authorID int64, msgType string, content string, isForwarded bool) (*Message, error)
+	CreateMessage(conversationID, authorID int64, msgType string, content string, secondaryContent string, isForwarded bool) (*Message, error)
 	GetMessageByID(id int64) (*Message, error)
 	GetMessagesByConversation(conversationID int64) ([]Message, error)
 	GetLastMessageByConversation(conversationID int64) (*Message, error)

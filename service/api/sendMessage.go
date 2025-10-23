@@ -19,6 +19,7 @@ import (
 type sendTextMessageRequest struct {
 	Type    string `json:"type"`
 	Content string `json:"content"`
+	SecondaryContent string `json:"secondaryContent"`
 }
 
 type sendMessageResponse struct {
@@ -26,6 +27,7 @@ type sendMessageResponse struct {
 	Type      string    `json:"type"`
 	Content   string    `json:"content"`
 	CreatedAt time.Time `json:"createdAt"`
+	SecondaryContent string `json:"secondaryContent"`
 }
 
 func (rt *_router) sendMessage(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -61,7 +63,7 @@ func (rt *_router) sendMessage(w http.ResponseWriter, r *http.Request, ps httpro
 			return
 		}
 
-		msg, err := rt.db.CreateMessage(convID, ctx.User.ID, req.Type, req.Content, false)
+		msg, err := rt.db.CreateMessage(convID, ctx.User.ID, req.Type, req.Content, "", false)
 		if err != nil {
 			http.Error(w, ErrorMessage(InternalServerError), http.StatusInternalServerError)
 			return
@@ -89,6 +91,7 @@ func (rt *_router) sendMessage(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	file, header, err := r.FormFile("file")
+	secondaryContent := r.FormValue("secondaryContent")
 	if err != nil {
 		http.Error(w, ErrorMessage("No File Uploaded"), http.StatusBadRequest)
 		return
@@ -135,7 +138,7 @@ func (rt *_router) sendMessage(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	// create DB message (only after successful local write)
-	msg, err := rt.db.CreateMessage(convID, ctx.User.ID, "image", "", false)
+	msg, err := rt.db.CreateMessage(convID, ctx.User.ID, "image", "", secondaryContent, false)
 	if err != nil {
 		os.Remove(tempFile.Name())
 		ctx.Logger.WithError(err).Error("failed to create image message")

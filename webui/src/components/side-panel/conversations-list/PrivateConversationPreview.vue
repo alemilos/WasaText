@@ -6,7 +6,7 @@ import UserPhoto from "../../reusables/UserPhoto.vue";
 import LastMessagePreview from "./LastMessagePreview.vue";
 
 const props = defineProps({
-	conversation: { type: Object, default: {} },
+	conversation: { type: Object },
 	onOpenConversation: { type: Function, required: true },
 });
 

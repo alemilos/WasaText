@@ -63,6 +63,7 @@ func (rt *_router) forwardMessage(w http.ResponseWriter, r *http.Request, ps htt
 		userID,
 		originalMsg.Type,
 		originalMsg.Content,
+		originalMsg.SecondaryContent,
 		true, // isForwarded
 	)
 	if err != nil {
