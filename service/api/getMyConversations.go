@@ -23,12 +23,13 @@ type Conversation struct {
 }
 
 type Message struct {
-	ID          int64     `json:"id"`
-	Type        string    `json:"type"` // "text" | "image"
-	IsForwarded bool      `json:"isForwarded"`
-	AuthorID    int64     `json:"authorId"`
-	Content     string    `json:"content"`
-	CreatedAt   time.Time `json:"createdAt"`
+	ID               int64     `json:"id"`
+	Type             string    `json:"type"` // "text" | "image"
+	IsForwarded      bool      `json:"isForwarded"`
+	AuthorID         int64     `json:"authorId"`
+	Content          string    `json:"content"`
+	SecondaryContent string    `json:"secondaryContent"`
+	CreatedAt        time.Time `json:"createdAt"`
 }
 
 type getMyConversationsResponse struct {
@@ -78,12 +79,13 @@ func (rt *_router) getMyConversations(w http.ResponseWriter, r *http.Request, ps
 		lastMsg, err := rt.db.GetLastMessageByConversation(conversation.ConversationID)
 		if err == nil && lastMsg != nil {
 			apiConversations[i].LastMessage = &Message{
-				ID:          lastMsg.ID,
-				Type:        lastMsg.Type,
-				IsForwarded: lastMsg.IsForwarded,
-				AuthorID:    lastMsg.AuthorID,
-				Content:     lastMsg.Content,
-				CreatedAt:   lastMsg.CreatedAt,
+				ID:               lastMsg.ID,
+				Type:             lastMsg.Type,
+				IsForwarded:      lastMsg.IsForwarded,
+				AuthorID:         lastMsg.AuthorID,
+				Content:          lastMsg.Content,
+				SecondaryContent: lastMsg.SecondaryContent,
+				CreatedAt:        lastMsg.CreatedAt,
 			}
 		}
 	}

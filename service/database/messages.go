@@ -7,21 +7,21 @@ import (
 
 // Message represents a chat message
 type Message struct {
-	ID             int64     `json:"id"`
-	Type           string    `json:"type"` // "text" or "image"
-	IsForwarded    bool      `json:"is_forwarded"`
-	ConversationID int64     `json:"conversation_id"`
-	AuthorID       int64     `json:"author_id"`
-	Content        string    `json:"content"`
-	SecondaryContent string `json:"secondary_content"`
-	CreatedAt      time.Time `json:"created_at"`
+	ID               int64     `json:"id"`
+	Type             string    `json:"type"` // "text" or "image"
+	IsForwarded      bool      `json:"is_forwarded"`
+	ConversationID   int64     `json:"conversation_id"`
+	AuthorID         int64     `json:"author_id"`
+	Content          string    `json:"content"`
+	SecondaryContent string    `json:"secondary_content"`
+	CreatedAt        time.Time `json:"created_at"`
 }
 
 // CreateMessage inserts a new message into a conversation
 func (db *appdbimpl) CreateMessage(conversationID, authorID int64, msgType string, content string, secondaryContent string, isForwarded bool) (*Message, error) {
 	res, err := db.c.Exec(`
 		INSERT INTO messages (type, is_forwarded, conversation_id, author_id, content, secondary_content)
-		VALUES (?, ?, ?, ?, ?)`,
+		VALUES (?, ?, ?, ?, ?, ?)`,
 		msgType, boolToInt(isForwarded), conversationID, authorID, content, secondaryContent)
 	if err != nil {
 		return nil, err
@@ -36,9 +36,9 @@ func (db *appdbimpl) GetMessageByID(id int64) (*Message, error) {
 	var m Message
 	var isForwardedInt int
 	err := db.c.QueryRow(`
-		SELECT id, type, is_forwarded, conversation_id, author_id, content, created_at
+		SELECT id, type, is_forwarded, conversation_id, author_id, content, secondary_content, created_at
 		FROM messages WHERE id = ?`, id).
-		Scan(&m.ID, &m.Type, &isForwardedInt, &m.ConversationID, &m.AuthorID, &m.Content, &m.CreatedAt)
+		Scan(&m.ID, &m.Type, &isForwardedInt, &m.ConversationID, &m.AuthorID, &m.Content, &m.SecondaryContent, &m.CreatedAt)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
@@ -52,7 +52,7 @@ func (db *appdbimpl) GetMessageByID(id int64) (*Message, error) {
 // GetMessagesByConversation fetches all messages in a conversation
 func (db *appdbimpl) GetMessagesByConversation(conversationID int64) ([]Message, error) {
 	rows, err := db.c.Query(`
-		SELECT id, type, is_forwarded, conversation_id, author_id, content, created_at
+		SELECT id, type, is_forwarded, conversation_id, author_id, content, secondary_content, created_at
 		FROM messages
 		WHERE conversation_id = ?
 		ORDER BY created_at ASC`, conversationID)
@@ -65,7 +65,7 @@ func (db *appdbimpl) GetMessagesByConversation(conversationID int64) ([]Message,
 	for rows.Next() {
 		var m Message
 		var isForwardedInt int
-		if err := rows.Scan(&m.ID, &m.Type, &isForwardedInt, &m.ConversationID, &m.AuthorID, &m.Content, &m.CreatedAt); err != nil {
+		if err := rows.Scan(&m.ID, &m.Type, &isForwardedInt, &m.ConversationID, &m.AuthorID, &m.Content, &m.SecondaryContent, &m.CreatedAt); err != nil {
 			return nil, err
 		}
 		m.IsForwarded = intToBool(isForwardedInt)
@@ -91,12 +91,12 @@ func (db *appdbimpl) GetLastMessageByConversation(conversationID int64) (*Messag
 	var m Message
 	var isForwardedInt int
 	err := db.c.QueryRow(`
-		SELECT id, type, is_forwarded, conversation_id, author_id, content, created_at
+		SELECT id, type, is_forwarded, conversation_id, author_id, content, secondary_content, created_at
 		FROM messages
 		WHERE conversation_id = ?
 		ORDER BY created_at DESC
 		LIMIT 1`, conversationID).
-		Scan(&m.ID, &m.Type, &isForwardedInt, &m.ConversationID, &m.AuthorID, &m.Content, &m.CreatedAt)
+		Scan(&m.ID, &m.Type, &isForwardedInt, &m.ConversationID, &m.AuthorID, &m.Content, &m.SecondaryContent, &m.CreatedAt)
 
 	if err == sql.ErrNoRows {
 		return nil, nil

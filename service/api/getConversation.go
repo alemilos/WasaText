@@ -33,14 +33,15 @@ type ConversationMember struct {
 }
 
 type ConversationMessage struct {
-	MessageID     int64         `json:"messageId"`
-	Type          string        `json:"type"`
-	IsForwarded   bool          `json:"isForwarded"`
-	Content       string        `json:"content"`
-	AuthorID      int64         `json:"authorId"`
-	CreatedAt     string        `json:"createdAt"`
-	MessageStatus MessageStatus `json:"messageStatus"`
-	Comments      []Comment     `json:"comments"`
+	MessageID        int64         `json:"messageId"`
+	Type             string        `json:"type"`
+	IsForwarded      bool          `json:"isForwarded"`
+	Content          string        `json:"content"`
+	SecondaryContent string        `json:"secondaryContent"`
+	AuthorID         int64         `json:"authorId"`
+	CreatedAt        string        `json:"createdAt"`
+	MessageStatus    MessageStatus `json:"messageStatus"`
+	Comments         []Comment     `json:"comments"`
 }
 
 type GetConversationResponse struct {
@@ -95,12 +96,13 @@ func (rt *_router) databaseToApiConversationMessages(
 		}
 
 		apiMessages = append(apiMessages, ConversationMessage{
-			MessageID:   msg.ID,
-			Type:        msg.Type,
-			IsForwarded: msg.IsForwarded,
-			Content:     msg.Content,
-			AuthorID:    msg.AuthorID,
-			CreatedAt:   msg.CreatedAt.UTC().Format(time.RFC3339),
+			MessageID:        msg.ID,
+			Type:             msg.Type,
+			IsForwarded:      msg.IsForwarded,
+			Content:          msg.Content,
+			SecondaryContent: msg.SecondaryContent,
+			AuthorID:         msg.AuthorID,
+			CreatedAt:        msg.CreatedAt.UTC().Format(time.RFC3339),
 			MessageStatus: MessageStatus{
 				Status:  status,
 				Members: readMembers,

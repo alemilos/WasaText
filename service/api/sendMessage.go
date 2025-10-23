@@ -17,17 +17,17 @@ import (
 )
 
 type sendTextMessageRequest struct {
-	Type    string `json:"type"`
-	Content string `json:"content"`
+	Type             string `json:"type"`
+	Content          string `json:"content"`
 	SecondaryContent string `json:"secondaryContent"`
 }
 
 type sendMessageResponse struct {
-	MessageID int64     `json:"messageId"`
-	Type      string    `json:"type"`
-	Content   string    `json:"content"`
-	CreatedAt time.Time `json:"createdAt"`
-	SecondaryContent string `json:"secondaryContent"`
+	MessageID        int64     `json:"messageId"`
+	Type             string    `json:"type"`
+	Content          string    `json:"content"`
+	CreatedAt        time.Time `json:"createdAt"`
+	SecondaryContent string    `json:"secondaryContent"`
 }
 
 func (rt *_router) sendMessage(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -92,6 +92,7 @@ func (rt *_router) sendMessage(w http.ResponseWriter, r *http.Request, ps httpro
 
 	file, header, err := r.FormFile("file")
 	secondaryContent := r.FormValue("secondaryContent")
+	rt.baseLogger.Info(secondaryContent)
 	if err != nil {
 		http.Error(w, ErrorMessage("No File Uploaded"), http.StatusBadRequest)
 		return
@@ -175,9 +176,10 @@ func (rt *_router) sendMessage(w http.ResponseWriter, r *http.Request, ps httpro
 	// --- Step 5: return response ---
 	w.Header().Set("Content-Type", "application/json")
 	_ = json.NewEncoder(w).Encode(sendMessageResponse{
-		MessageID: msg.ID,
-		Type:      msg.Type,
-		Content:   msg.Content,
-		CreatedAt: msg.CreatedAt,
+		MessageID:        msg.ID,
+		Type:             msg.Type,
+		Content:          msg.Content,
+		SecondaryContent: msg.SecondaryContent,
+		CreatedAt:        msg.CreatedAt,
 	})
 }
