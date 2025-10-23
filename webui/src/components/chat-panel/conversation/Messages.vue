@@ -6,25 +6,41 @@ import { auth } from "../../../stores/authStore";
 import TextMessage from "./message/TextMessage.vue";
 import ImageMessage from "./message/ImageMessage.vue";
 import isEqual from "lodash.isequal";
+import { readMessages } from "../../../services/conversations";
 
 const messages = computed(
 	() => conversationStore.currentConversation.value?.messages || []
 );
+const conversationId = computed(
+	() => conversationStore.currentConversation.value?.conversationId
+);
 const conversationType = computed(
 	() => conversationStore.currentConversation.value?.type
 );
+
 const userId = computed(() => auth.userId);
 
 const messagesContainer = ref(null);
 
-// Scroll to bottom when messages change
+async function handleReadMessages() {
+	const unreadMessages = messages.value
+		.filter(
+			(message) =>
+				!message?.messageStatus?.members?.includes(Number(userId.value))
+		)
+		.map((message) => message.messageId);
 
+	await readMessages(conversationId.value, unreadMessages);
+}
+
+// Scroll to bottom when messages change
 watch(
 	messages,
 	(newMessages, oldMessages) => {
 		// avoid scrolling if identical
 		if (!isEqual(newMessages, oldMessages)) {
 			nextTick(() => {
+				handleReadMessages();
 				scrollToBottom();
 			});
 		}
@@ -35,6 +51,7 @@ watch(
 // Also scroll when component mounts
 onMounted(() => {
 	nextTick(() => {
+		handleReadMessages();
 		scrollToBottom();
 	});
 });
@@ -60,6 +77,7 @@ function scrollToBottom() {
 				v-else-if="message.type === 'image'"
 				:message="message"
 				:is-sent="message.authorId == userId"
+				:conversationType="conversationType"
 			/>
 		</div>
 	</div>

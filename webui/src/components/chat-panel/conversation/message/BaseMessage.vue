@@ -1,9 +1,10 @@
 <script setup>
 import { computed } from "vue";
-import { conversationStore } from "../../../../stores/conversationStore";
-import { auth } from "../../../../stores/authStore";
 import { usersStore } from "../../../../stores/usersStore";
 import UserPhoto from "../../../reusables/UserPhoto.vue";
+import DoubleTicks from "@/assets/icons/doubleticks.svg";
+import SingleTick from "@/assets/icons/singletick.svg";
+import PendingMessage from "@/assets/icons/sendingmessage.svg";
 
 const props = defineProps({
 	message: { type: Object, required: true },
@@ -39,19 +40,12 @@ const senderPhotoPath = computed(() => {
 	return null;
 });
 
-const getStatusText = computed(() => {
+const statusIcon = computed(() => {
 	const status = props.message.messageStatus?.status;
-	const members = props.message.messageStatus?.members || [];
 
-	if (props.conversationType === "group") {
-		const totalMembers =
-			conversationStore.currentConversation.value?.participants?.length ||
-			0;
-		return `Letto da ${members.length}/${totalMembers}`;
-	} else {
-		// private conversation
-		return status === "received" ? "Letto" : "Inviato";
-	}
+	if (status === "read") return DoubleTicks;
+	if (status === "received") return SingleTick;
+	return PendingMessage; // default: pending
 });
 </script>
 
@@ -68,7 +62,8 @@ const getStatusText = computed(() => {
 
 			<div class="status-bar">
 				<span class="time">{{ formatTime(message.createdAt) }}</span>
-				<span class="status" v-if="isSent">{{ getStatusText }}</span>
+				<!-- <span class="status" v-if="isSent">{{ getStatusText }}</span> -->
+				<img v-if="isSent" :src="statusIcon" class="status-icon" />
 			</div>
 		</div>
 	</div>
@@ -134,6 +129,13 @@ const getStatusText = computed(() => {
 	max-width: fit-content;
 	color: var(--color-green-primary);
 	justify-self: end;
+}
+
+.status-icon {
+	width: 12px;
+	height: 12px;
+	margin-left: 4px;
+	vertical-align: middle;
 }
 
 .time {

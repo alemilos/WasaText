@@ -54,13 +54,8 @@ async function pollConversation() {
 function pushMessage(message) {
 	if (!currentConversation.value) return;
 
-	// Ensure messages array exists
-	if (!currentConversation.value.messages) {
-		currentConversation.value.messages = [];
-	}
-
-	// Push new message and trigger reactivity
-	currentConversation.value.messages.push(message);
+	const oldMessages = currentConversation.value.messages || [];
+	currentConversation.value.messages = [...oldMessages, message];
 }
 
 export const conversationStore = {

@@ -19,7 +19,6 @@ export function sendTextMessage(conversationId, content) {
 	return post(url, { type: "text", content });
 }
 export function sendImageMessage(conversationId, imageFile, text) {
-	console.log(text);
 	const formData = new FormData();
 	formData.append("type", "image");
 	formData.append("file", imageFile);
@@ -29,9 +28,9 @@ export function sendImageMessage(conversationId, imageFile, text) {
 	return postForm(url, formData);
 }
 
-export function readMessages() {
-	const { conversationId } = boh;
+export function readMessages(conversationId, messages) {
+	if (!messages || !messages.length) return;
 	const url = Endpoints.readMessages.replace(":id", conversationId);
 
-	return post(url);
+	return post(url, { messages });
 }
