@@ -1,5 +1,5 @@
 <script setup>
-import { ref, provide, onMounted, onUnmounted } from "vue";
+import { ref, provide, onMounted, onUnmounted, markRaw } from "vue";
 import ModalOverlay from "@/components/ui/ModalOverlay.vue";
 
 const modal = ref(null);
@@ -14,7 +14,7 @@ function showPageScroll() {
 
 function openModal(ModalComponent, props = {}) {
 	hidePageScroll();
-	modal.value = { ModalComponent, props };
+	modal.value = { ModalComponent: markRaw(ModalComponent), props };
 }
 
 function closeModal() {

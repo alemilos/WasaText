@@ -25,6 +25,6 @@ export function setGroupPhoto() {
 	return put(url);
 }
 
-export function createGroup() {
-	return post(Endpoints.createGroup);
+export function createGroup(name, members) {
+	return post(Endpoints.createGroup, { name, members });
 }

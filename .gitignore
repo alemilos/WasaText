@@ -18,3 +18,4 @@ docker-compose.log
 # Linters
 .spectral.js
 .golangci.yaml
+eslint.config.mjs

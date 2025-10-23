@@ -2,6 +2,7 @@
 import { reactive } from "vue";
 import { doLogin } from "../services/auth";
 import { LocalStorage } from "../config/localStorage";
+import { getError } from "../utils/getError";
 
 const auth = reactive({
 	userId: localStorage.getItem(LocalStorage.userId) || null,
@@ -19,7 +20,7 @@ async function login(username) {
 
 	return {
 		ok: false,
-		error: res?.error || res.response?.data?.message || res.response?.data,
+		error: getError(res),
 	};
 }
 

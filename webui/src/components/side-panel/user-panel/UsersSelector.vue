@@ -6,9 +6,14 @@ const props = defineProps({
 		type: Object,
 		default: [],
 	},
-
 	selectedUserId: {
+		// for one selection allowed
 		type: [String, Number, null],
+		default: null,
+	},
+	selectedUserIds: {
+		// for multiple selections
+		type: Array,
 		default: null,
 	},
 	onSelect: {
@@ -16,6 +21,13 @@ const props = defineProps({
 		required: true,
 	},
 });
+
+function isSelected(userId) {
+	if (props.selectedUserIds) {
+		return props.selectedUserIds.includes(userId);
+	}
+	return props.selectedUserId === userId;
+}
 </script>
 
 <template>
@@ -29,10 +41,9 @@ const props = defineProps({
 			class="userSelector-row-container"
 			@click="props.onSelect(user.userId)"
 			:style="{
-				backgroundColor:
-					user.userId === props.selectedUserId
-						? 'var(--color-white-20)'
-						: 'var(--color-white-5)',
+				backgroundColor: isSelected(user.userId)
+					? 'var(--color-white-20)'
+					: 'var(--color-white-5)',
 			}"
 		>
 			<UserPhoto :url="user.photoPath" :size="36" />
