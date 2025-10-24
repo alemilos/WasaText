@@ -1,5 +1,5 @@
 import { Endpoints } from "../config/endpoints";
-import { del, put, post } from "./axios";
+import { del, put, post, putForm } from "./axios";
 
 export function addToGroup(groupId, userId) {
 	const url = Endpoints.addToGroup.replace(":id", groupId);
@@ -11,16 +11,17 @@ export function leaveGroup(groupId, userId) {
 	return del(url, { userId });
 }
 
-export function setGroupName() {
-	const { groupId } = boh;
+export function setGroupName(groupId, name) {
 	const url = Endpoints.setGroupName.replace(":id", groupId);
-	return put(url);
+	return put(url, { name });
 }
 
-export function setGroupPhoto() {
-	const { groupId } = boh;
+export function setGroupPhoto(groupId, imageFile) {
+	const formData = new FormData();
+	formData.append("file", imageFile);
+
 	const url = Endpoints.setGroupPhoto.replace(":id", groupId);
-	return put(url);
+	return putForm(url, formData);
 }
 
 export function createGroup(name, members) {

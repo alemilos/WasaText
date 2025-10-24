@@ -3,7 +3,7 @@ import UserPhoto from "../../reusables/UserPhoto.vue";
 
 const props = defineProps({
 	users: {
-		type: Object,
+		type: Function,
 		default: [],
 	},
 	selectedUserId: {

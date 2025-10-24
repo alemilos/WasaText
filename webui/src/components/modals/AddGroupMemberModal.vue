@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import UsersSelector from "../side-panel/user-panel/UsersSelector.vue";
 import Modal from "../ui/Modal.vue";
 import ModalTitle from "../ui/ModalTitle.vue";
@@ -11,6 +11,7 @@ import { auth } from "../../stores/authStore";
 import GroupInformationsModal from "./GroupInformationsModal.vue";
 import { addToGroup } from "../../services/groups";
 import { getError } from "../../utils/getError";
+import { conversationStore } from "../../stores/conversationStore";
 
 const props = defineProps({
 	conversation: Object,
@@ -20,7 +21,19 @@ const userId = computed(() => auth.userId);
 
 const conversationId = computed(() => props.conversation?.conversationId);
 
-const conversationMembers = computed(() => props.conversation?.members);
+// members need to be reactive
+const members = ref([...(props.conversation?.members || [])]);
+watch(
+	() => conversationStore.currentConversation.value?.members,
+	(newMembers) => {
+		if (newMembers) {
+			members.value = [...newMembers];
+		}
+	},
+	{ immediate: true }
+);
+// const conversationMembers = computed(() => props.conversation?.members);
+const conversationMembers = computed(() => members.value);
 
 const isAdmin = computed(() => {
 	return conversationMembers.value.find((user) => user.userId == userId.value).role === "admin";
@@ -74,7 +87,7 @@ async function handleConfirm() {
 		$toast.success(`Hai aggiunto ${successfullyAddedIds.length} utenti`);
 	}
 
-	closeModal();
+	selectedUserIds.value = [];
 }
 
 function handleGoBack() {

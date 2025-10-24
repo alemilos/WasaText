@@ -12,20 +12,14 @@ watch(
 	() => auth.userId,
 	async (newUserId) => {
 		if (newUserId) {
-			await Promise.all([
-				usersStore.loadUsers(),
-				conversationsStore.loadConversations(),
-			]);
+			await Promise.all([usersStore.loadUsers(), conversationsStore.loadConversations()]);
 
 			// clear prev intervals
 			if (intervalId) clearInterval(intervalId);
 
 			intervalId = setInterval(async () => {
-				await Promise.all([
-					usersStore.loadUsers(),
-					conversationsStore.loadConversations(),
-				]);
-			}, 3000);
+				await Promise.all([usersStore.loadUsers(), conversationsStore.loadConversations()]);
+			}, 1000);
 		} else {
 			// on logout clear state
 			if (intervalId) {

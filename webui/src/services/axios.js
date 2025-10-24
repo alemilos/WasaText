@@ -46,9 +46,7 @@ export async function post(url, data = {}, config = {}) {
 export async function put(url, data = {}, config = {}) {
 	if (typeof data === "string") data = JSON.parse(data);
 
-	return axiosInstance
-		.put(url, { ...data }, { ...config })
-		.then((response) => response);
+	return axiosInstance.put(url, { ...data }, { ...config }).then((response) => response);
 }
 
 export async function postForm(url, form, config = {}) {
@@ -60,10 +58,18 @@ export async function postForm(url, form, config = {}) {
 		.then((response) => response);
 }
 
-export async function del(url, data = {}, config = {}) {
+export async function putForm(url, form, config = {}) {
 	return axiosInstance
-		.delete(url, { data, ...config })
+		.put(url, form, {
+			headers: { "Content-Type": "multipart/form-data" },
+			transformRequest: (formData) => formData,
+			...config,
+		})
 		.then((response) => response);
+}
+
+export async function del(url, data = {}, config = {}) {
+	return axiosInstance.delete(url, { data, ...config }).then((response) => response);
 }
 
 export default axiosInstance;

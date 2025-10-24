@@ -5,16 +5,14 @@ import UnselectedConversation from "./unselected-conversation/UnselectedConversa
 import Conversation from "./conversation/Conversation.vue";
 
 // reactive reference to current conversation
-const currentConversation = computed(
-	() => conversationStore.currentConversation.value
-);
+const currentConversation = computed(() => conversationStore.currentConversation.value);
 
 let pollInterval = null;
 
 onMounted(() => {
 	pollInterval = setInterval(() => {
 		conversationStore.pollConversation();
-	}, 3000);
+	}, 1000);
 });
 
 onUnmounted(() => {

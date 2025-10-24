@@ -36,9 +36,7 @@ async function pollConversation() {
 	if (!currentConversation.value?.conversationId) return;
 
 	try {
-		const res = await getConversation(
-			currentConversation.value.conversationId
-		);
+		const res = await getConversation(currentConversation.value.conversationId);
 		if (res.status === 200) {
 			const newData = res.data;
 
@@ -58,6 +56,47 @@ function pushMessage(message) {
 	currentConversation.value.messages = [...oldMessages, message];
 }
 
+function updatePhotoPath(conversationId, photoPath) {
+	if (!currentConversation.value) return;
+	if (!currentConversation.value.conversationId == conversationId) return;
+	// Add a version query string to bypass caching
+	currentConversation.value.photoPath = `${photoPath}?v=${Date.now()}`;
+}
+
+function updateConversationName(conversationId, name) {
+	if (!currentConversation.value) return;
+	if (!currentConversation.value.conversationId == conversationId) return;
+
+	currentConversation.value.photoPath = name;
+}
+
+function removeMembers(conversationId, memberIds) {
+	if (!currentConversation.value || currentConversation.value.conversationId !== conversationId) return;
+
+	if (!Array.isArray(currentConversation.value.members)) return;
+
+	currentConversation.value.members = currentConversation.value.members.filter(
+		(member) => !memberIds.includes(member.userId)
+	);
+}
+
+function addMembers(conversationId, memberIds) {
+	if (!currentConversation.value || currentConversation.value.conversationId !== conversationId) return;
+
+	if (!Array.isArray(memberIds) || !memberIds.length) return;
+
+	if (!Array.isArray(currentConversation.value.members)) {
+		currentConversation.value.members = [];
+	}
+
+	const existingIds = currentConversation.value.members.map((m) => m.userId);
+	const newMembers = memberIds.filter((id) => !existingIds.includes(id)).map((id) => ({ userId: id }));
+
+	if (newMembers.length) {
+		currentConversation.value.members.push(...newMembers);
+	}
+}
+
 export const conversationStore = {
 	currentConversation,
 	isLoading,
@@ -66,4 +105,8 @@ export const conversationStore = {
 	closeConversation,
 	pollConversation,
 	pushMessage,
+	updatePhotoPath,
+	updateConversationName,
+	removeMembers,
+	addMembers,
 };

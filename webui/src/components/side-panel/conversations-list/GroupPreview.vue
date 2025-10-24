@@ -2,7 +2,6 @@
 import UserPhoto from "../../reusables/UserPhoto.vue";
 import LastMessagePreview from "./LastMessagePreview.vue";
 import "./style/Conversation.css";
-import defaultGroupImage from "@/assets/images/default-group.png";
 
 const props = defineProps({
 	conversation: { type: Object },
