@@ -1,0 +1,19 @@
+FROM node:lts AS builder
+
+WORKDIR /app
+COPY webui webui
+
+WORKDIR /app/webui
+
+RUN yarn cache clean
+RUN corepack enable && yarn install --immutable --check-cache
+
+RUN yarn build-prod
+
+FROM nginx:stable
+
+COPY --from=builder /app/webui/dist /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
