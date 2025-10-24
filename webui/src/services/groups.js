@@ -1,10 +1,9 @@
 import { Endpoints } from "../config/endpoints";
 import { del, put, post } from "./axios";
 
-export function addToGroup() {
-	const { groupId } = boh;
+export function addToGroup(groupId, userId) {
 	const url = Endpoints.addToGroup.replace(":id", groupId);
-	return post(url);
+	return post(url, { userId });
 }
 
 export function leaveGroup(groupId, userId) {

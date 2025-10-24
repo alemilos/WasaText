@@ -12,13 +12,14 @@ import { useToast } from "vue-toast-notification";
 import { getError } from "../../utils/getError";
 import { useModal } from "../../hooks/useModal";
 import { conversationStore } from "../../stores/conversationStore";
+import AddGroupMemberModal from "./AddGroupMemberModal.vue";
 
 const props = defineProps({
 	conversation: Object,
 });
 
 const $toast = useToast();
-const { closeModal } = useModal();
+const { openModal, closeModal } = useModal();
 
 const userId = computed(() => auth.userId);
 const conversationId = computed(() => props.conversation?.conversationId);
@@ -68,7 +69,6 @@ async function removeUsers() {
 
 		if (successfullyRemovedIds.length) {
 			// conversationStore.removeMembers(successfullyRemovedIds);
-			console.log("removed ", successfullyRemovedIds);
 			$toast.success(`Hai rimosso ${successfullyRemovedIds.length} utenti`);
 		}
 
@@ -101,6 +101,10 @@ async function leaveGroupHandler() {
 		$toast.error(err);
 	}
 }
+
+function handleOpenAddMemberModal() {
+	openModal(AddGroupMemberModal, { conversation: props.conversation });
+}
 </script>
 
 <template>
@@ -110,7 +114,7 @@ async function leaveGroupHandler() {
 			<div class="groupInformationsModal-currentUsers">
 				<p>Utenti nel gruppo</p>
 
-				<div v-if="isAdmin" class="addMembers-container">
+				<div v-if="isAdmin" class="addMembers-container" @click="handleOpenAddMemberModal">
 					<img :src="PlusIcon" />
 					<span>Aggiungi un membro</span>
 				</div>

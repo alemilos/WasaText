@@ -41,18 +41,14 @@ function isSelected(userId) {
 			maxHeight: props.maxHeight ? props.maxHeight + 'px' : null,
 		}"
 	>
-		<p class="usersSelectList-no-users" v-if="!users.length">
-			Non ci sono utenti con cui iniziare una conversazione!
-		</p>
+		<p class="usersSelectList-no-users" v-if="!users.length">Non ci sono utenti selezionabili!</p>
 		<div
 			v-for="user in users"
 			:key="user.userId"
 			class="userSelector-row-container"
 			@click="props.onSelect(user.userId)"
 			:style="{
-				backgroundColor: isSelected(user.userId)
-					? 'var(--color-white-20)'
-					: 'var(--color-white-5)',
+				backgroundColor: isSelected(user.userId) ? 'var(--color-white-20)' : 'var(--color-white-5)',
 			}"
 		>
 			<UserPhoto :url="user.photoPath" :size="36" />
