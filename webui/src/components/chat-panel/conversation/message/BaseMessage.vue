@@ -216,7 +216,8 @@ const togglePopup = () => {
 	position: absolute;
 	bottom: -28px;
 	left: 8px;
-	background: rgba(0, 0, 0, 0.6);
+	background-color: var(--color-green-dark);
+	border: 1px solid var(--color-white-20);
 	border-radius: 12px;
 	padding: 4px 8px;
 	max-width: 90%;
