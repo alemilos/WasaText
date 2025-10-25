@@ -56,6 +56,14 @@ function pushMessage(message) {
 	currentConversation.value.messages = [...oldMessages, message];
 }
 
+function removeMessage(messageId) {
+	if (!currentConversation.value) return;
+
+	currentConversation.value.messages = currentConversation.value.messages.filter(
+		(message) => message.messageId !== messageId
+	);
+}
+
 function updatePhotoPath(conversationId, photoPath) {
 	if (!currentConversation.value) return;
 	if (!currentConversation.value.conversationId == conversationId) return;
@@ -97,6 +105,16 @@ function addMembers(conversationId, memberIds) {
 	}
 }
 
+function commentMessage(conversationId, messageId, comment) {
+	if (!currentConversation.value || currentConversation.value.conversationId !== conversationId) return;
+
+	const message = currentConversation.value.messages?.find((m) => m.messageId === messageId);
+	if (!message) return;
+
+	if (!Array.isArray(message.comments)) message.comments = [];
+	message.comments.push(comment);
+}
+
 export const conversationStore = {
 	currentConversation,
 	isLoading,
@@ -105,8 +123,10 @@ export const conversationStore = {
 	closeConversation,
 	pollConversation,
 	pushMessage,
+	removeMessage,
 	updatePhotoPath,
 	updateConversationName,
 	removeMembers,
 	addMembers,
+	commentMessage,
 };
