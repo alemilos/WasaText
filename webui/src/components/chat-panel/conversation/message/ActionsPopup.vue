@@ -43,7 +43,7 @@ async function handleDeleteMessage() {
 }
 
 async function handleRemoveReaction() {
-	const res = await uncommentMessage(props.message.messageId); // adjust params as needed
+	const res = await uncommentMessage(props.message.messageId);
 	if (res.status !== 200) {
 		const err = getError(res, "Impossibile rimuovere la reazione");
 		$toast.error(err);
@@ -94,12 +94,10 @@ const hasReacted = ref(!!emojiAlreadyReacted.value);
 	padding: 8px;
 }
 
-/* Sent → align to right */
 .actionsPopup-container.sent {
 	right: 10px;
 }
 
-/* Received → align to left */
 .actionsPopup-container.received {
 	left: 10px;
 }

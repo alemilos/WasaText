@@ -89,7 +89,6 @@ async function removeUsers() {
 			// conversationStore.removeMembers(successfullyRemovedIds);
 			$toast.success(`Hai rimosso ${successfullyRemovedIds.length} utenti`);
 
-			console.log("removed ids: ", successfullyRemovedIds);
 			conversationsStore.removeMembers(conversationId.value, successfullyRemovedIds);
 			conversationStore.removeMembers(conversationId.value, successfullyRemovedIds);
 		}

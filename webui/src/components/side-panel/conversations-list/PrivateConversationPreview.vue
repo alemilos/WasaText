@@ -20,10 +20,8 @@ function handleClick() {
 
 watch(
 	() => usersStore.users.value,
-	(newVal, oldVal) => {
-		console.log("Users changed:", newVal);
-	},
-	{ deep: true } // necessary because Map is nested/reactive
+	(newVal, oldVal) => {},
+	{ deep: true }
 );
 </script>
 

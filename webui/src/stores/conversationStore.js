@@ -45,6 +45,8 @@ async function pollConversation() {
 				...currentConversation.value,
 				...newData,
 			};
+		} else {
+			return { shouldClose: true }; // notify caller that he must close the conversation
 		}
 	} catch (err) {}
 }

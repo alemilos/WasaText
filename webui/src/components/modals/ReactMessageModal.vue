@@ -178,7 +178,7 @@ async function handleConfirm() {
 }
 
 async function handleRemoveReaction() {
-	const res = await uncommentMessage(props.message.messageId); // adjust params as needed
+	const res = await uncommentMessage(props.message.messageId);
 	if (res.status !== 200) {
 		const err = getError(res, "Impossibile rimuovere la reazione");
 		$toast.error(err);
@@ -231,7 +231,6 @@ const hasReacted = ref(!!emojiAlreadyReacted.value);
 	margin-bottom: 12px;
 }
 
-/* grid */
 .emoji-grid {
 	display: grid;
 	grid-template-columns: repeat(8, 1fr);

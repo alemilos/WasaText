@@ -32,7 +32,6 @@ watch(
 	},
 	{ immediate: true }
 );
-// const conversationMembers = computed(() => props.conversation?.members);
 const conversationMembers = computed(() => members.value);
 
 const isAdmin = computed(() => {
@@ -83,7 +82,6 @@ async function handleConfirm() {
 	});
 
 	if (successfullyAddedIds.length) {
-		// conversationStore.removeMembers(successfullyRemovedIds);
 		$toast.success(`Hai aggiunto ${successfullyAddedIds.length} utenti`);
 	}
 

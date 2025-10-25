@@ -3,24 +3,18 @@ import { ref, computed } from "vue";
 import GalleryIcon from "@/assets/icons/gallery-icon.svg";
 import sendMessageIcon from "@/assets/icons/send-message.svg";
 import { useToast } from "vue-toast-notification";
-import {
-	sendImageMessage,
-	sendTextMessage,
-} from "../../../services/conversations";
+import { sendImageMessage, sendTextMessage } from "../../../services/conversations";
 import { conversationStore } from "../../../stores/conversationStore";
 import { auth } from "../../../stores/authStore";
+import { getError } from "../../../utils/getError";
 
 const $toast = useToast();
 const messageText = ref("");
 const selectedFile = ref(null);
 
-const currentConversation = computed(
-	() => conversationStore.currentConversation.value
-);
+const currentConversation = computed(() => conversationStore.currentConversation.value);
 
-const conversationId = computed(
-	() => currentConversation.value?.conversationId ?? null
-);
+const conversationId = computed(() => currentConversation.value?.conversationId ?? null);
 
 const userId = computed(() => auth.userId);
 
@@ -56,11 +50,7 @@ async function sendMessage(conversationId) {
 		let res;
 		if (selectedFile.value) {
 			// send image && text
-			res = await sendImageMessage(
-				conversationId,
-				selectedFile.value,
-				messageText.value
-			);
+			res = await sendImageMessage(conversationId, selectedFile.value, messageText.value);
 			selectedFile.value = null; // reset file
 			messageText.value = ""; // reset text
 		} else {
@@ -73,6 +63,11 @@ async function sendMessage(conversationId) {
 
 		lastMessage = { ...lastMessage, ...res.data };
 		conversationStore.pushMessage(lastMessage);
+
+		if (!res.status === 200) {
+			const err = getError(res, "C'è stato un errore nel mandare il messaggio");
+			$toast.error(err);
+		}
 	} catch (err) {
 		$toast.error("C'è stato un errore nel mandare il messaggio");
 	}
@@ -109,16 +104,8 @@ function onKeyPress(e) {
 
 				<!-- Container to show that image was selecgted -->
 				<div v-if="selectedFile" class="selected-file-overlay">
-					<span
-						>Hai allegato un'immagine al messaggio, cancellala se
-						cambi idea.</span
-					>
-					<button
-						@click="selectedFile = null"
-						class="remove-file-button"
-					>
-						×
-					</button>
+					<span>Hai allegato un'immagine al messaggio, cancellala se cambi idea.</span>
+					<button @click="selectedFile = null" class="remove-file-button">×</button>
 				</div>
 			</div>
 			<img

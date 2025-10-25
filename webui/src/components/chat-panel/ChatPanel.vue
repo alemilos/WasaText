@@ -1,23 +1,39 @@
 <script setup>
-import { computed, onMounted, onUnmounted } from "vue";
+import { watch, computed, onMounted, onUnmounted } from "vue";
 import { conversationStore } from "@/stores/conversationStore";
 import UnselectedConversation from "./unselected-conversation/UnselectedConversation.vue";
 import Conversation from "./conversation/Conversation.vue";
 
-// reactive reference to current conversation
 const currentConversation = computed(() => conversationStore.currentConversation.value);
 
 let pollInterval = null;
 
 onMounted(() => {
-	pollInterval = setInterval(() => {
-		conversationStore.pollConversation();
-	}, 1000);
+	startPolling();
 });
 
 onUnmounted(() => {
-	clearInterval(pollInterval);
+	stopPolling();
 });
+
+function startPolling() {
+	stopPolling(); // clear any previous intervals
+
+	pollInterval = setInterval(async () => {
+		if (currentConversation.value) {
+			const res = await conversationStore.pollConversation();
+			if (res?.shouldClose) conversationStore.closeConversation(); // make sure the user gets the conversation closed if he is notified
+		} else {
+		}
+	}, 1000);
+}
+
+function stopPolling() {
+	if (pollInterval) {
+		clearInterval(pollInterval);
+		pollInterval = null;
+	}
+}
 </script>
 
 <template>

@@ -8,15 +8,9 @@ import ImageMessage from "./message/ImageMessage.vue";
 import isEqual from "lodash.isequal";
 import { readMessages } from "../../../services/conversations";
 
-const messages = computed(
-	() => conversationStore.currentConversation.value?.messages || []
-);
-const conversationId = computed(
-	() => conversationStore.currentConversation.value?.conversationId
-);
-const conversationType = computed(
-	() => conversationStore.currentConversation.value?.type
-);
+const messages = computed(() => conversationStore.currentConversation.value?.messages || []);
+const conversationId = computed(() => conversationStore.currentConversation.value?.conversationId);
+const conversationType = computed(() => conversationStore.currentConversation.value?.type);
 
 const userId = computed(() => auth.userId);
 
@@ -24,10 +18,7 @@ const messagesContainer = ref(null);
 
 async function handleReadMessages() {
 	const unreadMessages = messages.value
-		.filter(
-			(message) =>
-				!message?.messageStatus?.members?.includes(Number(userId.value))
-		)
+		.filter((message) => !message?.messageStatus?.members?.includes(Number(userId.value)))
 		.map((message) => message.messageId);
 
 	await readMessages(conversationId.value, unreadMessages);
@@ -45,7 +36,7 @@ watch(
 			});
 		}
 	},
-	{ deep: false } // avoid unnecessary nested reactivity
+	{ deep: false }
 );
 
 // Also scroll when component mounts
@@ -58,8 +49,7 @@ onMounted(() => {
 
 function scrollToBottom() {
 	if (messagesContainer.value) {
-		messagesContainer.value.scrollTop =
-			messagesContainer.value.scrollHeight;
+		messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
 	}
 }
 </script>

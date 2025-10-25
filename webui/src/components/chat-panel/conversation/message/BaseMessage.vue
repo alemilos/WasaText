@@ -101,7 +101,6 @@ const togglePopup = () => {
 
 			<div class="status-bar">
 				<span class="time">{{ formatTime(message.createdAt) }}</span>
-				<!-- <span class="status" v-if="isSent">{{ getStatusText }}</span> -->
 				<img v-if="isSent" :src="statusIcon" class="status-icon" />
 			</div>
 
