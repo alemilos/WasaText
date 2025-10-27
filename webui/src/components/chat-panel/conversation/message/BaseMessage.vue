@@ -7,6 +7,8 @@ import DoubleTicks from "@/assets/icons/doubleticks.svg";
 import SingleTick from "@/assets/icons/singletick.svg";
 import PendingMessage from "@/assets/icons/sendingmessage.svg";
 import ActionsPopup from "./ActionsPopup.vue";
+import { useModal } from "../../../../hooks/useModal";
+import ReactionsModal from "../../../modals/ReactionsModal.vue";
 
 const props = defineProps({
 	message: { type: Object, required: true },
@@ -14,6 +16,7 @@ const props = defineProps({
 	conversationType: { type: String, default: "private" }, // "private" or "group"
 });
 
+const { openModal } = useModal();
 const alignment = computed(() => (props.isSent ? "sent" : "received"));
 const bubbleColor = computed(() => (props.isSent ? "sent-bubble" : "received-bubble"));
 const messageReactions = computed(() => props.message.comments);
@@ -79,6 +82,10 @@ const statusIcon = computed(() => {
 const togglePopup = () => {
 	showPopup.value = !showPopup.value;
 };
+
+function handleOpenReactionsModal() {
+	openModal(ReactionsModal, { reactions: messageReactions.value });
+}
 </script>
 
 <template>
@@ -104,7 +111,11 @@ const togglePopup = () => {
 				<img v-if="isSent" :src="statusIcon" class="status-icon" />
 			</div>
 
-			<div v-if="Object.keys(groupedReactions).length" class="reactions-container">
+			<div
+				v-if="Object.keys(groupedReactions).length"
+				class="reactions-container"
+				@click="handleOpenReactionsModal"
+			>
 				<div class="reactions-scroll">
 					<div v-for="(count, emoji) in groupedReactions" :key="emoji" class="reaction-item">
 						<span class="emoji">{{ emoji }}</span>
@@ -213,6 +224,7 @@ const togglePopup = () => {
 
 .reactions-container {
 	position: absolute;
+	cursor: pointer;
 	bottom: -28px;
 	left: 8px;
 	background-color: var(--color-green-dark);
