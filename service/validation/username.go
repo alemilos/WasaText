@@ -8,7 +8,7 @@ import (
 // Username validation rules
 const (
 	MinUsernameLength = 3
-	MaxUsernameLength = 20 
+	MaxUsernameLength = 20
 )
 
 var usernameRegex = regexp.MustCompile(`^[a-zA-Z0-9_]*[a-zA-Z][a-zA-Z0-9_]*$`)
