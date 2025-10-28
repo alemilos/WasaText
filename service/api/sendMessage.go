@@ -20,6 +20,7 @@ type sendTextMessageRequest struct {
 	Type             string `json:"type"`
 	Content          string `json:"content"`
 	SecondaryContent string `json:"secondaryContent"`
+	ReplyTo          int64  `json:"replyTo"` // the messageId to reply to
 }
 
 type sendMessageResponse struct {
@@ -28,6 +29,7 @@ type sendMessageResponse struct {
 	Content          string    `json:"content"`
 	CreatedAt        time.Time `json:"createdAt"`
 	SecondaryContent string    `json:"secondaryContent"`
+	ReplyTo          int64     `json:"replyTo"`
 }
 
 func (rt *_router) sendMessage(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -63,7 +65,7 @@ func (rt *_router) sendMessage(w http.ResponseWriter, r *http.Request, ps httpro
 			return
 		}
 
-		msg, err := rt.db.CreateMessage(convID, ctx.User.ID, req.Type, req.Content, "", false)
+		msg, err := rt.db.CreateMessage(convID, ctx.User.ID, req.Type, req.Content, "", false, req.ReplyTo)
 		if err != nil {
 			http.Error(w, ErrorMessage(InternalServerError), http.StatusInternalServerError)
 			return
@@ -80,6 +82,7 @@ func (rt *_router) sendMessage(w http.ResponseWriter, r *http.Request, ps httpro
 			Type:      msg.Type,
 			Content:   msg.Content,
 			CreatedAt: msg.CreatedAt,
+			ReplyTo:   msg.ReplyTo,
 		})
 		return
 	}
@@ -92,6 +95,9 @@ func (rt *_router) sendMessage(w http.ResponseWriter, r *http.Request, ps httpro
 
 	file, header, err := r.FormFile("file")
 	secondaryContent := r.FormValue("secondaryContent")
+	replyTo := r.FormValue("replyTo")
+	replyToInt, _ :=
+		strconv.ParseInt(replyTo, 10, 64)
 	if err != nil {
 		http.Error(w, ErrorMessage("No File Uploaded"), http.StatusBadRequest)
 		return
@@ -138,7 +144,7 @@ func (rt *_router) sendMessage(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	// create DB message (only after successful local write)
-	msg, err := rt.db.CreateMessage(convID, ctx.User.ID, "image", "", secondaryContent, false)
+	msg, err := rt.db.CreateMessage(convID, ctx.User.ID, "image", "", secondaryContent, false, replyToInt)
 	if err != nil {
 		os.Remove(tempFile.Name())
 		ctx.Logger.WithError(err).Error("failed to create image message")
@@ -179,6 +185,7 @@ func (rt *_router) sendMessage(w http.ResponseWriter, r *http.Request, ps httpro
 		Type:             msg.Type,
 		Content:          msg.Content,
 		SecondaryContent: msg.SecondaryContent,
+		ReplyTo:          msg.ReplyTo,
 		CreatedAt:        msg.CreatedAt,
 	})
 }

@@ -45,6 +45,7 @@ func InitializeSchema(db *sql.DB) error {
     		author_id INTEGER NOT NULL,
     		content TEXT NOT NULL,
 			secondary_content TEXT NOT NULL,
+			reply_to INTEGER, 
     		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 
     		FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE,

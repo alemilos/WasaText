@@ -65,6 +65,7 @@ func (rt *_router) forwardMessage(w http.ResponseWriter, r *http.Request, ps htt
 		originalMsg.Content,
 		originalMsg.SecondaryContent,
 		true, // isForwarded
+		0,    // the reply is not considered when forwarding
 	)
 	if err != nil {
 		http.Error(w, "Failed to forward message", http.StatusInternalServerError)
