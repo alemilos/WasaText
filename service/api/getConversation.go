@@ -38,6 +38,7 @@ type ConversationMessage struct {
 	IsForwarded      bool          `json:"isForwarded"`
 	Content          string        `json:"content"`
 	SecondaryContent string        `json:"secondaryContent"`
+	ReplyTo          int64         `json:"replyTo"`
 	AuthorID         int64         `json:"authorId"`
 	CreatedAt        string        `json:"createdAt"`
 	MessageStatus    MessageStatus `json:"messageStatus"`
@@ -101,6 +102,7 @@ func (rt *_router) databaseToApiConversationMessages(
 			IsForwarded:      msg.IsForwarded,
 			Content:          msg.Content,
 			SecondaryContent: msg.SecondaryContent,
+			ReplyTo:          msg.ReplyTo,
 			AuthorID:         msg.AuthorID,
 			CreatedAt:        msg.CreatedAt.UTC().Format(time.RFC3339),
 			MessageStatus: MessageStatus{

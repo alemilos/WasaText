@@ -29,6 +29,7 @@ type Message struct {
 	AuthorID         int64     `json:"authorId"`
 	Content          string    `json:"content"`
 	SecondaryContent string    `json:"secondaryContent"`
+	ReplyTo          int64     `json:"replyTo"`
 	CreatedAt        time.Time `json:"createdAt"`
 }
 
@@ -85,6 +86,7 @@ func (rt *_router) getMyConversations(w http.ResponseWriter, r *http.Request, ps
 				AuthorID:         lastMsg.AuthorID,
 				Content:          lastMsg.Content,
 				SecondaryContent: lastMsg.SecondaryContent,
+				ReplyTo:          lastMsg.ReplyTo,
 				CreatedAt:        lastMsg.CreatedAt,
 			}
 		}
