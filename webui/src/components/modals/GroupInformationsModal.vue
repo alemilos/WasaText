@@ -20,6 +20,8 @@ const props = defineProps({
 	conversation: Object,
 });
 
+const localConversation = ref({ ...props.conversation });
+
 const $toast = useToast();
 const { openModal, closeModal } = useModal();
 
@@ -46,7 +48,7 @@ const conversationMembers = computed(() => members.value);
 const selectedUserIds = ref([]);
 
 const isAdmin = computed(() => {
-	return conversationMembers.value.find((user) => user.userId == userId.value).role === "admin";
+	return conversationMembers.value.find((user) => user.userId == userId.value)?.role === "admin";
 });
 
 function onSelect(userId) {
@@ -127,7 +129,7 @@ async function leaveGroupHandler() {
 const selectedFile = ref(null);
 const previewUrl = ref(null);
 const fileInputRef = ref(null);
-const groupName = ref(props.conversation?.name || "");
+const groupName = ref(localConversation.value.name || "");
 
 const groupPhotoPath = computed(() => conversationsStore.getPhotoPath(conversationId.value));
 const displayedGroupPhoto = computed(() => {
@@ -187,7 +189,7 @@ async function handleSetGroupName() {
 	try {
 		const res = await setGroupName(conversationId.value, groupName.value);
 		if (res.status === 200) {
-			props.conversation.name = groupName.value;
+			localConversation.value.name = groupName.value;
 			conversationsStore.updateConversationName(conversationId.value, groupName.value); // conversationS (store)
 			conversationStore.updateConversationName(conversationId.value, groupName.value); // conversatioN
 			$toast.success("Nome del gruppo aggiornato");
@@ -205,7 +207,7 @@ function handleOpenAddMemberModal() {
 }
 
 const submitGroupNameEnabled = computed(() => {
-	return groupName.value.trim() !== "" && groupName.value !== props.conversation?.name;
+	return groupName.value.trim() !== "" && groupName.value !== localConversation.value.name;
 });
 </script>
 
