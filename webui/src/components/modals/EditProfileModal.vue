@@ -42,7 +42,7 @@ function onFileChange(event) {
 		$toast.error("Il file deve essere jpg, png o webp.");
 		return;
 	}
-	if (file.size > 2_000_000) {
+	if (file.size > 2000000) {
 		$toast.error("Il file può essere al massimo di 2Mb.");
 		return;
 	}
@@ -68,10 +68,7 @@ async function handleUpdatePhoto() {
 			usersStore.updatePhotoPath(userId.value, res.data.photoPath);
 			removeSelectedFile();
 		} else {
-			const err = getError(
-				res,
-				"Errore durante l'aggiornamento della foto"
-			);
+			const err = getError(res, "Errore durante l'aggiornamento della foto");
 			$toast.error(err);
 		}
 	} catch (err) {
@@ -100,9 +97,7 @@ async function handleLogout() {
 }
 
 const submitUsernameEnabled = computed(() => {
-	return (
-		username.value.trim() !== "" && username.value !== currentUsername.value
-	);
+	return username.value.trim() !== "" && username.value !== currentUsername.value;
 });
 
 const displayedPhoto = computed(() => {
@@ -113,16 +108,12 @@ const displayedPhoto = computed(() => {
 	<Modal>
 		<div class="editProfileModal-container">
 			<ModalTitle text="Modifica profilo" />
-			<p>
-				Queste sono le tue informazioni profilo, puoi anche modificarle.
-			</p>
+			<p>Queste sono le tue informazioni profilo, puoi anche modificarle.</p>
 
 			<div class="editProfileModal-photoEdit">
 				<UserPhoto :url="displayedPhoto" :size="100" />
 				<div class="editProfileModal-photoEdit-buttons">
-					<button v-if="!selectedFile" @click="onFileButtonClick">
-						Modifica
-					</button>
+					<button v-if="!selectedFile" @click="onFileButtonClick">Modifica</button>
 					<input
 						type="file"
 						ref="fileInputRef"
@@ -137,31 +128,18 @@ const displayedPhoto = computed(() => {
 					>
 						Annulla
 					</button>
-					<button v-if="selectedFile" @click="handleUpdatePhoto">
-						Conferma
-					</button>
+					<button v-if="selectedFile" @click="handleUpdatePhoto">Conferma</button>
 				</div>
 			</div>
 
 			<div class="editProfileModal-usernameEdit">
 				<div class="editProfileModal-inputWrapper">
-					<LabeledInput
-						label="Username"
-						placeholder="Modifica il tuo username..."
-						v-model:value="username"
-					/>
+					<LabeledInput label="Username" placeholder="Modifica il tuo username..." v-model:value="username" />
 				</div>
-				<button
-					:disabled="!submitUsernameEnabled"
-					@click="handleUpdateUsername"
-				>
-					Conferma cambio
-				</button>
+				<button :disabled="!submitUsernameEnabled" @click="handleUpdateUsername">Conferma cambio</button>
 			</div>
 
-			<button @click="handleLogout" class="editProfileModal-logout">
-				Logout
-			</button>
+			<button @click="handleLogout" class="editProfileModal-logout">Logout</button>
 		</div>
 	</Modal>
 </template>

@@ -147,7 +147,7 @@ function onFileChange(event) {
 		$toast.error("Il file deve essere jpg, png o webp.");
 		return;
 	}
-	if (file.size > 2_000_000) {
+	if (file.size > 2000000) {
 		$toast.error("Il file può essere al massimo di 2Mb.");
 		return;
 	}
