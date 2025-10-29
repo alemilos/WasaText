@@ -11,6 +11,7 @@ import { getError } from "../../../../utils/getError";
 import { conversationStore } from "../../../../stores/conversationStore";
 import ReactMessageModal from "../../../modals/ReactMessageModal.vue";
 import { auth } from "../../../../stores/authStore";
+import { replyStore } from "../../../../stores/replyStore";
 
 const { openModal } = useModal();
 const $toast = useToast();
@@ -53,6 +54,15 @@ async function handleRemoveReaction() {
 	}
 }
 
+async function handleReply() {
+	replyStore.setReply({
+		messageId: props.message.messageId,
+		messageType: props.message.type,
+		content: props.message.content,
+		secondaryContent: props.message.secondaryContent,
+	});
+}
+
 const hasReacted = ref(!!emojiAlreadyReacted.value);
 </script>
 
@@ -70,6 +80,10 @@ const hasReacted = ref(!!emojiAlreadyReacted.value);
 			<img :src="EmojiIcon" />
 			<span>Rimuovi Reazione</span>
 		</div>
+		<div class="actionsPopup-row" @click="handleReply">
+			<img :src="FwIcon" class="flip-icon" />
+			<span>Rispondi</span>
+		</div>
 		<div v-if="isSent" class="actionsPopup-row deleteIcon" @click="handleDeleteMessage">
 			<img :src="DeleteIcon" />
 			<span>Cancella</span>
@@ -78,6 +92,9 @@ const hasReacted = ref(!!emojiAlreadyReacted.value);
 </template>
 
 <style scoped>
+.flip-icon {
+	transform: rotate(180deg);
+}
 .actionsPopup-container {
 	position: absolute;
 	width: 200px;

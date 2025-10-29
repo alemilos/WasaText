@@ -7,10 +7,12 @@ import { sendImageMessage, sendTextMessage } from "../../../services/conversatio
 import { conversationStore } from "../../../stores/conversationStore";
 import { auth } from "../../../stores/authStore";
 import { getError } from "../../../utils/getError";
+import { replyStore } from "../../../stores/replyStore";
 
 const $toast = useToast();
 const messageText = ref("");
 const selectedFile = ref(null);
+const replyTo = replyStore.replyingTo;
 
 const currentConversation = computed(() => conversationStore.currentConversation.value);
 
@@ -48,23 +50,27 @@ async function sendMessage(conversationId) {
 	try {
 		let lastMessage = { authorId: userId };
 		let res;
+
+		const replyMessageId = replyTo.value?.messageId;
+
 		if (selectedFile.value) {
 			// send image && text
-			res = await sendImageMessage(conversationId, selectedFile.value, messageText.value);
+			res = await sendImageMessage(conversationId, selectedFile.value, messageText.value, replyMessageId);
 			selectedFile.value = null; // reset file
 			messageText.value = ""; // reset text
 		} else {
 			// send text
 			const text = messageText.value.trim();
 			if (!text) return;
-			res = await sendTextMessage(conversationId, text);
+			res = await sendTextMessage(conversationId, text, replyMessageId);
 			messageText.value = ""; // reset text
 		}
 
-		lastMessage = { ...lastMessage, ...res.data };
-		conversationStore.pushMessage(lastMessage);
-
-		if (!res.status === 200) {
+		if (res.status === 200) {
+			lastMessage = { ...lastMessage, ...res.data };
+			conversationStore.pushMessage(lastMessage);
+			replyStore.clearReply();
+		} else {
 			const err = getError(res, "C'è stato un errore nel mandare il messaggio");
 			$toast.error(err);
 		}
@@ -94,6 +100,7 @@ function onKeyPress(e) {
 
 		<div class="messageHandler-input-container">
 			<div class="messageHandler-input-wrapper">
+				<!-- Container to show that reply was selecgted -->
 				<input
 					type="text"
 					class="messageHandler-input"
@@ -101,6 +108,20 @@ function onKeyPress(e) {
 					v-model="messageText"
 					@keypress="onKeyPress"
 				/>
+
+				<div v-if="replyTo" class="reply-preview" :style="{ top: selectedFile ? '-90px' : '-40px' }">
+					<div class="reply-text">
+						Rispondendo a
+						{{
+							replyTo.messageType === "image"
+								? replyTo.secondaryContent
+									? `Foto: "${replyTo.secondaryContent}"`
+									: "Foto"
+								: `${replyTo.content}`
+						}}
+					</div>
+					<button @click="replyStore.clearReply" class="cancel-reply">×</button>
+				</div>
 
 				<!-- Container to show that image was selecgted -->
 				<div v-if="selectedFile" class="selected-file-overlay">
@@ -116,3 +137,33 @@ function onKeyPress(e) {
 		</div>
 	</div>
 </template>
+
+<style scoped>
+.reply-preview {
+	position: absolute;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	background-color: rgba(255, 255, 255, 0.1);
+	padding: 0px 10px;
+	border-left: 3px solid var(--color-green-primary);
+	border-radius: 6px;
+}
+
+.reply-text {
+	color: var(--color-white);
+	font-size: 14px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	width: 90%;
+}
+
+.cancel-reply {
+	background: none;
+	border: none;
+	color: var(--color-white-70);
+	font-size: 18px;
+	cursor: pointer;
+}
+</style>

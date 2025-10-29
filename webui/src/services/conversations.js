@@ -14,15 +14,16 @@ export function getConversation(conversationId) {
 	return get(url);
 }
 
-export function sendTextMessage(conversationId, content) {
+export function sendTextMessage(conversationId, content, replyTo) {
 	const url = Endpoints.sendMessage.replace(":id", conversationId);
-	return post(url, { type: "text", content });
+	return post(url, { type: "text", content, replyTo });
 }
-export function sendImageMessage(conversationId, imageFile, text) {
+export function sendImageMessage(conversationId, imageFile, text, replyTo) {
 	const formData = new FormData();
 	formData.append("type", "image");
 	formData.append("file", imageFile);
 	formData.append("secondaryContent", text);
+	formData.append("replyTo", replyTo);
 
 	const url = Endpoints.sendMessage.replace(":id", conversationId);
 	return postForm(url, formData);

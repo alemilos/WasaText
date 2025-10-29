@@ -9,6 +9,7 @@ import PendingMessage from "@/assets/icons/sendingmessage.svg";
 import ActionsPopup from "./ActionsPopup.vue";
 import { useModal } from "../../../../hooks/useModal";
 import ReactionsModal from "../../../modals/ReactionsModal.vue";
+import { conversationStore } from "../../../../stores/conversationStore";
 
 const props = defineProps({
 	message: { type: Object, required: true },
@@ -29,6 +30,35 @@ const groupedReactions = computed(() => {
 	});
 
 	return counts;
+});
+
+const repliedMessage = computed(() => {
+	const replyId = props.message.replyTo;
+	if (!replyId) return null;
+	return (
+		conversationStore.currentConversation.value.messages.find((m) => m.messageId === replyId) || {
+			type: "text",
+			content: "Il messaggio è stato cancellato",
+		}
+	);
+});
+
+const repliedMessageText = computed(() => {
+	if (!repliedMessage.value) return null;
+
+	const msg = repliedMessage.value;
+	if (msg.type === "image") {
+		if (msg.secondaryContent) {
+			return `Foto: "${msg.secondaryContent}"`;
+		}
+		return "Foto";
+	}
+	return msg.content;
+});
+
+const repliedMessageUsername = computed(() => {
+	if (!repliedMessage.value) return null;
+	return repliedMessage.value.authorId ? usersStore.getUsername(repliedMessage.value.authorId) : null;
 });
 
 const showPopup = ref(false);
@@ -104,6 +134,16 @@ function handleOpenReactionsModal() {
 				<span> ~ {{ senderName }} </span>
 			</div>
 
+			<!-- Reply message -->
+			<div v-if="repliedMessage && props.message.replyTo" class="reply-preview">
+				<div v-if="repliedMessageUsername" class="reply-header">
+					<span class="reply-username">{{ repliedMessageUsername }}</span>
+				</div>
+				<div class="reply-content">
+					{{ repliedMessageText }}
+				</div>
+			</div>
+
 			<slot></slot>
 
 			<div class="status-bar">
@@ -129,6 +169,31 @@ function handleOpenReactionsModal() {
 </template>
 
 <style scoped>
+.reply-preview {
+	border-left: 3px solid var(--color-green-primary);
+	background-color: rgba(255, 255, 255, 0.05);
+	padding: 6px 8px;
+	border-radius: 8px;
+	margin-bottom: 4px;
+	margin-top: 10px;
+}
+
+.reply-header {
+	font-weight: bold;
+	color: var(--color-green-primary);
+	font-size: 13px;
+	margin-bottom: 2px;
+}
+
+.reply-content {
+	color: var(--color-white);
+	font-size: 13px;
+	opacity: 0.9;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
 .base-message {
 	display: flex;
 	margin: 8px 0;
