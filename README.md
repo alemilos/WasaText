@@ -17,7 +17,7 @@ It features a Go-based REST API backend and a Vue.js frontend for a smooth, resp
   <tr>
     <td align="center">
       <img src="./readme_assets/groupinfo.png" alt="Group Edit Modal" width="350"/><br>
-      <b>Group Edit Modal</b>
+      <b>Customization</b>
     </td>
     <td align="center">
       <img src="./readme_assets/harrychat.png" alt="Private Chat" width="350"/><br>
