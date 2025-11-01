@@ -3,9 +3,28 @@
 WasaText is a real-time chat application inspired by WhatsApp.
 It features a Go-based REST API backend and a Vue.js frontend for a smooth, responsive chatting experience.
 
-![App screenshot 1](./readme_assets/avengerschat.png)
-![App screenshot 2](./readme_assets/groupinfo.png)
-![App screenshot 3](./readme_assets/harrychat.png)
+<table>
+  <tr>
+    <td align="center">
+      <img src="./readme_assets/login.png" alt="Login Page" width="350"/><br>
+      <b>Login Page</b>
+    </td>
+    <td align="center">
+      <img src="./readme_assets/avengerschat.png" alt="Group Chat" width="350"/><br>
+      <b>Group Chat</b>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="./readme_assets/groupinfo.png" alt="Group Edit Modal" width="350"/><br>
+      <b>Group Edit Modal</b>
+    </td>
+    <td align="center">
+      <img src="./readme_assets/harrychat.png" alt="Private Chat" width="350"/><br>
+      <b>Private Chat</b>
+    </td>
+  </tr>
+</table>
 
 ## 🏗️ Tech Stack
 
