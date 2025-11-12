@@ -3,28 +3,25 @@
 WasaText is a real-time chat application inspired by WhatsApp.
 It features a Go-based REST API backend and a Vue.js frontend for a smooth, responsive chatting experience.
 
-<table>
+<table style="width:100%; table-layout:fixed; border-collapse:collapse;">
   <tr>
-    <td align="center">
-      <img src="./readme_assets/login.png" alt="Login Page" width="350"/><br>
-      <b>Login Page</b>
+    <td style="width:50%; padding:0;">
+      <img src="./readme_assets/login.png" alt="Login Page" width="100%"/>
     </td>
-    <td align="center">
-      <img src="./readme_assets/avengerschat.png" alt="Group Chat" width="350"/><br>
-      <b>Group Chat</b>
+    <td style="width:50%; padding:0;">
+      <img src="./readme_assets/avengerschat.png" alt="Group Chat" width="100%"/>
     </td>
   </tr>
   <tr>
-    <td align="center">
-      <img src="./readme_assets/groupinfo.png" alt="Group Edit Modal" width="350"/><br>
-      <b>Customization</b>
+    <td style="width:50%; padding:0;">
+      <img src="./readme_assets/groupinfo.png" alt="Group Edit Modal" width="100%"/>
     </td>
-    <td align="center">
-      <img src="./readme_assets/harrychat.png" alt="Private Chat" width="350"/><br>
-      <b>Private Chat</b>
+    <td style="width:50%; padding:0;">
+      <img src="./readme_assets/harrychat.png" alt="Private Chat" width="100%"/>
     </td>
   </tr>
 </table>
+
 
 ## 🏗️ Tech Stack
 
